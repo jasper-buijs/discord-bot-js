@@ -1,0 +1,73 @@
+const Discord = require("discord.js");
+const playdl = require("play-dl");
+const { SlashCommandBuilder } = require('discord.js');
+module.exports = {
+    data: new SlashCommandBuilder().setName("play").setDescription("Play a song in a voice channel.").addStringOption(op => op.setName("song").setDescription("name or url of the song you want to play.").setRequired(true)),
+    async execute(client, interaction) {
+        if (!interaction.member.voice.channelId) {
+            console.log("> ERROR with MUSIC: user not in voice channel");
+            return await interaction.reply({ content: "You are not in a voice channel.", ephemeral: true });
+        };
+        if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channel.id !== interaction.guild.members.me.voice.channel.id) {
+            console.log("> ERROR with MUSIC: user in diffrent voice channel.");
+            return await interaction.reply({ content: "You are in a diffrent voice channel.", ephemeral: true });
+        };
+        const query = interaction.options.getString("song");
+        client.queue = client.player.createQueue(interaction.guild, {
+            metadata: {
+                interaction: interaction,
+                channel: interaction.channel
+            },
+            async onBeforeCreateStream(track, source, _queue) {
+                if (source === "youtube") {
+                    return (await playdl.stream(track.url, { discordPlayerCompatibility: true })).stream.catch(err => console.error(err));
+                }
+            }
+        });
+        try {
+            if (!client.queue.connection) await client.queue.connect(interaction.member.voice.channel);
+        } catch {
+            client.queue.destroy();
+            console.log("> ERROR with MUSIC: could not connect to voice channel.");
+            return await interaction.reply({ content: "I failed to connect to your voice channel.", ephemeral: true});
+        }
+        await interaction.deferReply();
+        const track = await client.player.search(query, {
+            requestedBy: interaction.user
+        }).then(result => result.tracks[0]);
+        if (!track) return await interaction.editReply({ content: `I could not find anything for "${query}".` });
+        // longer than 15:00 song
+        if (Number(track.duration.split(":").slice(-2)[0]) >= 14) {
+            if (!client.queue.tracks.length && !client.queue.playing) await client.queue.destroy(true);
+            interactionToDelete = await interaction.editReply({ content: `I can't play songs that are longer than 15 minutes. That song was ${track.duration} long.` });
+            setTimeout(async function(message){
+                await message.delete();
+            }, 15000, interactionToDelete);
+            return interactionToDelete;
+        }
+        // longer than 15:00 queue
+        let queueLength = Number(track.duration.split(":").slice(-2)[0])*60;
+        queueLength += Number(track.duration.split(":").slice(-2)[1]);
+        if (client.queue.nowPlaying()) {
+            queueLength += Number(client.queue.nowPlaying().duration.split(":").splice(-2)[0])*60;
+            queueLength += Number(client.queue.nowPlaying().duration.split(":").splice(-2)[1]);
+        }
+        if (client.queue.tracks[0]) {
+            for (tIndex in client.queue.tracks) {
+                queueLength += Number(client.queue.tracks[tIndex].duration.split(":").splice(-2)[0])*60;
+                queueLength += Number(client.queue.tracks[tIndex].duration.split(":").splice(-2)[1]);
+            }
+        }
+        console.log(queueLength, queueLength >= 870);
+        if (queueLength >= 870) {
+            interactionToDelete = await interaction.editReply({ content: `I can't handle queues that are longer than 15 minutes. Try again in a moment.` });
+            setTimeout(async function(message){
+                await message.delete();
+            }, 15000, interactionToDelete);
+            return interactionToDelete;
+        }
+        // play
+        client.queue.play(track);
+        return await interaction.editReply({ content: `I'm loading your song "${track.title}".`});
+    }
+}
