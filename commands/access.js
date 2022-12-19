@@ -1,4 +1,4 @@
-const Discord = require("discord.js");
+//jasper: removed const Discord = require("discord.js");
 const { clientId, guildId } = require("../config.json");
 const { SlashCommandBuilder } = require("discord.js");
 module.exports = {
