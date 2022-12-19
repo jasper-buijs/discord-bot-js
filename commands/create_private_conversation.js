@@ -1,4 +1,3 @@
-//japser: removed const Discord = require("discord.js");
 const { clientId, guildId } = require("../config.json");
 const { SlashCommandBuilder, PermissionsBitField, ChannelType } = require('discord.js');
 module.exports = {
@@ -9,7 +8,7 @@ module.exports = {
         const temporaryVoiceChannelDeniedPermissions = [ PermissionsBitField.Flags.MentionEveryone, PermissionsBitField.Flags.ManageMessages, PermissionsBitField.Flags.SendTTSMessages, PermissionsBitField.Flags.UseApplicationCommands, PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.ManageRoles, PermissionsBitField.Flags.CreateInstantInvite, PermissionsBitField.Flags.PrioritySpeaker, PermissionsBitField.Flags.MuteMembers, PermissionsBitField.Flags.DeafenMembers, PermissionsBitField.Flags.MoveMembers, PermissionsBitField.Flags.ManageEvents ]
         if (interaction.member.voice.channel) {
             if (interaction.options.getInteger("users")) {
-                let newTemporaryChannel = await interaction.guild.channels.create({ //jasper: renamed from channel
+                let newTemporaryChannel = await interaction.guild.channels.create({
                     name: "private channel",
                     reason: "by user request", 
                     type: ChannelType.GuildVoice, 
@@ -25,7 +24,7 @@ module.exports = {
                 await interaction.editReply({ content: String(`A voice channel has been created.\nHold tight, you are now being moved.`), ephemeral: true });
                 await client.temporaryVoiceChannels.push(newTemporaryChannel);
             } else {
-                let newTemporaryChannel = await interaction.guild.channels.create({ //jasper: renamed from channel
+                let newTemporaryChannel = await interaction.guild.channels.create({
                     name: "temporary channel",
                     reason: "by user request", 
                     type: ChannelType.GuildVoice, 
@@ -42,7 +41,7 @@ module.exports = {
             }
         } else {
             if (interaction.options.getInteger("users")) {
-                let newTemporaryChannel = await interaction.guild.channels.create({ //jasper: renamed from channel
+                let newTemporaryChannel = await interaction.guild.channels.create({
                     name: "private channel",
                     reason: "by user request", 
                     type: ChannelType.GuildVoice, 
@@ -57,7 +56,7 @@ module.exports = {
                 await interaction.editReply({ content: String(`A voice channel has been created.\nYou can find it here: <#${newTemporaryChannel.id}>`), ephemeral: true });
                 await client.temporaryVoiceChannels.push(newTemporaryChannel);
             } else {
-                let newTemporaryChannel = await interaction.guild.channels.create({ //jasper: renamed from channel
+                let newTemporaryChannel = await interaction.guild.channels.create({
                     name: "temporary channel",
                     reason: "by user request", 
                     type: ChannelType.GuildVoice, 

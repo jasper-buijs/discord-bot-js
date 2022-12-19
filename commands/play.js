@@ -1,4 +1,3 @@
-//jasper: removed const Discord = require("discord.js");
 const playdl = require("play-dl");
 const { SlashCommandBuilder } = require('discord.js');
 module.exports = {
@@ -20,7 +19,7 @@ module.exports = {
             },
             async onBeforeCreateStream(track, source, _queue) {
                 if (source === "youtube") {
-                    return (await playdl.stream(track.url, { discordPlayerCompatibility: true })).stream; //jasper: removed .catch()
+                    return (await playdl.stream(track.url, { discordPlayerCompatibility: true })).stream;
                 }
             }
         });
@@ -58,7 +57,6 @@ module.exports = {
                 queueLength += Number(client.queue.tracks[tIndex].duration.split(":").splice(-2)[1]);
             }
         }
-        // jasper: removed console.log(queueLength, queueLength >= 870);
         if (queueLength >= 870) {
             interactionToDelete = await interaction.editReply({ content: `I can't handle queues that are longer than 15 minutes. Try again in a moment.` });
             setTimeout(async function(message){

@@ -1,4 +1,3 @@
-//jasper: removed const Discord = require("discord.js");
 const { ContextMenuCommandBuilder, ApplicationCommandType, ActionRowBuilder, SelectMenuBuilder, ComponentType, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 module.exports = {
     data: new ContextMenuCommandBuilder().setName("Report User").setType(ApplicationCommandType.User),
@@ -46,7 +45,7 @@ module.exports = {
                 }
             )
         );
-        const replyMessages = new Object({ //jasper: renamed from keys
+        const replyMessages = new Object({
             "offensive-profile-picture": "You may not use an offensive, gory, or otherwise **disrespectful profile picture** in our server. This infringement may be punished, and you may be kicked or banned from this server if you don't change your profile picture.",
             "offensive-profile-text": "You may not use offensive, discriminatory or otherwise **offensive text in your profile** (status, about-me, username, ...). This infringement may be punished, and you may be kicked or banned from this server if you don't change your profile information.",
             "self-botting": "**Self-botting**, user-botting, or otherwise using code or automation to (partially) control a Discord account that is not marked as a bot account is not allowed on Discord as per Discord's Terms Of Service and Community Guidelines. These kinds of infringements may be punished in our server and may be reported to Discord.",
@@ -54,7 +53,7 @@ module.exports = {
             "harassing-voice": "You may not harass, discriminate, insult, or otherwise **offend someone in a voice channel**. You may not engage in racism, hate speech, threats of violence or violent extremism. You may not share age-restricted content in a voice channel. These kinds of infringements may be punished in our server and may be reported to Discord.",
             "streaming-gore": "You may not live stream any content that may be seen as gore, acts or threats of violence, age restricted content or porn, or any otherwise **inappropriate content**. You are the sole person responsible for the content you live stream on Discord and in our server. These kinds of infringements may be punished in our server and may be reported to Discord."
         });
-        const editedReplyMessage = await interaction.editReply({ content: "Please select which rule was broken by this user.", ephemeral: true, components: [reasonSelector] }); //jasper: renamed from message
+        const editedReplyMessage = await interaction.editReply({ content: "Please select which rule was broken by this user.", ephemeral: true, components: [reasonSelector] });
         const filter = i => {
             i.deferUpdate();
             return i.user.id == interaction.user.id;
@@ -65,8 +64,8 @@ module.exports = {
             client.userReports.filter(report => report.reportedUserId == interaction.targetId).filter(report => report.reason == choise.values.join(", ")).forEach(report => {
                 report.actionTaken = true;
             });
-            const targetUser = client.userReports.filter(report => report.reportedUserId == interaction.targetId).filter(report => report.userId == interaction.user.id)[0].targetUser; //jasper: renamed from target
-            const targetMember = await interaction.guild.members.fetch({ user: targetUser.id, force: true }); //jasper: renamed from member
+            const targetUser = client.userReports.filter(report => report.reportedUserId == interaction.targetId).filter(report => report.userId == interaction.user.id)[0].targetUser;
+            const targetMember = await interaction.guild.members.fetch({ user: targetUser.id, force: true });
             const embed = new EmbedBuilder()
                 .setColor("cfb53b")
                 .setTitle(`${targetMember.displayName}`)
@@ -87,8 +86,8 @@ module.exports = {
             await interaction.editReply({ content: `You reported "${targetMember.displayName}" for the following reason: "${choise.values.join(", ")}".`, ephemeral: true, components: [] });
             console.log(`> WARNED after REPORT: user ${targetMember.displayName} ${targetUser.id} because of ${choise.values.join(", ")}.`);
         } else {
-            client.userReports.filter(report => report.reportedUserId == interaction.targetId).filter(report => report.userId == interaction.user.id).filter(report => report.reason == "unknown")[0].reason = choise.values.join(", "); //jasper: renamed from target
-            const targetUser = client.userReports.filter(report => report.reportedUserId == interaction.targetId).filter(report => report.userId == interaction.user.id)[0].targetUser; //jasper: renamed from member
+            client.userReports.filter(report => report.reportedUserId == interaction.targetId).filter(report => report.userId == interaction.user.id).filter(report => report.reason == "unknown")[0].reason = choise.values.join(", ");
+            const targetUser = client.userReports.filter(report => report.reportedUserId == interaction.targetId).filter(report => report.userId == interaction.user.id)[0].targetUser;
             const targetMember = await interaction.guild.members.fetch({ user: targetUser.id, force: true });
             const embed = new EmbedBuilder()
                 .setColor("cfb53b")

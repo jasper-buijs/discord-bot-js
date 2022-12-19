@@ -1,4 +1,3 @@
-//jasper: removed const Discord = require("discord.js");
 const { ContextMenuCommandBuilder, ApplicationCommandType, ActionRowBuilder, SelectMenuBuilder, ComponentType, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 module.exports = {
     data: new ContextMenuCommandBuilder().setName("Report Message").setType(ApplicationCommandType.Message),
@@ -71,7 +70,7 @@ module.exports = {
                 }
             )
         );
-        const replyMessages = new Object({ //jasper: renamed from keys
+        const replyMessages = new Object({
             "hate": "You may not participate in **hate speech** or discrimination of any kind. It’s unacceptable to attack a person or a community based on attributes such as their race, ethnicity, caste, national origin, sex, gender identity, gender presentation, sexual orientation, religious affiliation, age, serious illness, disabilities, or other protected classifications. These kinds of infringements may be punished in our server and may be reported to Discord.",
             "harassment": "You may not **harass** or threaten anyone, nor may you show acts of violance on Discord or in this server. This includes indirect or suggestive threats, as well as sharing or threatening to share someone’s personally identifiable information. This also includes glorifying violent events, the perpetrators of violent acts, or similar behaviors. These kinds of infringements may be punished in our server and may be reported to Discord.",
             "sexual-children": "**Sexualising children** or potential children is against the terms of Discord, and against the law. You cannot share contents or links which depict children in a pornographic, sexually suggestive, or violent manner, including illustrated or digitally altered pornography that depicts children and conduct grooming behaviors. Punishments against these kinds of infringements will be harsh; and you will be reported to Discord.",
@@ -84,19 +83,19 @@ module.exports = {
             "abuse-discord": "You may not **abuse Discord** or the services it provides, nor may you use Discord to promote or organize illegal activities of any kind. You may not use self-bots or user-bots (a bot, but behind a normal user account) anywhere on Discord. These kinds of infringements may be punished in our server and may be reported to Discord.",
             "other": "These kinds of infringements may be punished in our server and may be reported to Discord."
         });
-        const editedReplyMessage = await interaction.editReply({ content: "Please select which rule from the Community Guidelines was broken with this message.", ephemeral: true, components: [reasonSelector] }); //jasper: renamed from message
+        const editedReplyMessage = await interaction.editReply({ content: "Please select which rule from the Community Guidelines was broken with this message.", ephemeral: true, components: [reasonSelector] });
         const filter = i => {
             i.deferUpdate();
             return i.user.id == interaction.user.id;
         };
-        const choise = await editedReplyMessage.awaitMessageComponent({ filter, componentType: ComponentType.StringSelect, time: 60000 }).catch(err => console.error(err));//.catch(interaction.editReply({ content: "You failed to select a reason in time.", ephemeral: true, components: [] }));
+        const choise = await editedReplyMessage.awaitMessageComponent({ filter, componentType: ComponentType.StringSelect, time: 60000 }).catch(err => console.error(err));
         if (interaction.memberPermissions.has(PermissionFlagsBits.Administrator)) {
             client.messageReports.filter(report => report.messageId == interaction.targetId).filter(report => report.userId == interaction.user.id)[0].reason = choise.values.join(", ");
             client.messageReports.filter(report => report.messageId == interaction.targetId).forEach(report => {
                 report.actionTaken = true
             });
-            const targetMessage = client.messageReports.filter(report => report.messageId == interaction.targetId).filter(report => report.userId == interaction.user.id)[0].target; //jasper: renamed from target
-            const targetMember = await interaction.guild.members.fetch({ user: targetMessage.author.id, force: true }); //jasper: renamed from member
+            const targetMessage = client.messageReports.filter(report => report.messageId == interaction.targetId).filter(report => report.userId == interaction.user.id)[0].target;
+            const targetMember = await interaction.guild.members.fetch({ user: targetMessage.author.id, force: true });
             const embed = new EmbedBuilder()
                 .setColor("cfb53b")
                 .setTitle(`${targetMember.displayName}`)
@@ -123,8 +122,8 @@ module.exports = {
             console.log(`> DELETED after REPORT: message ${targetMessage.id} by ${targetMember.displayName} because of ${choise.values.join(", ")}: "${targetMessage.content}".`);
         } else {
             client.messageReports.filter(report => report.messageId == interaction.targetId).filter(report => report.userId == interaction.user.id)[0].reason = choise.values.join(", ");
-            const targetMessage = client.messageReports.filter(report => report.messageId == interaction.targetId).filter(report => report.userId == interaction.user.id)[0].target; //jasper: renamed from target
-            const targetMember = await interaction.guild.members.fetch({ user: targetMessage.author.id, force: true }); //jasper: renamed from member
+            const targetMessage = client.messageReports.filter(report => report.messageId == interaction.targetId).filter(report => report.userId == interaction.user.id)[0].target;
+            const targetMember = await interaction.guild.members.fetch({ user: targetMessage.author.id, force: true });
             const embed = new EmbedBuilder()
                 .setColor("cfb53b")
                 .setTitle(`${targetMember.displayName}`)
