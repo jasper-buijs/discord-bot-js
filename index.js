@@ -1,6 +1,6 @@
 // IMPORT PACKAGES
 const schedule = require("node-schedule");
-const { Client, GatewayIntentBits, Collection, InteractionType, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { Client, GatewayIntentBits, Collection, InteractionType, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, Events, EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 const { Player } = require("discord-player");
 const { token, clientId, guildId } = require("./config.json");
@@ -59,6 +59,43 @@ client.on("interactionCreate", async interaction => {
         }
     }
 });
+// EXAMEN PLANNER **TMP**
+client.examModal = new ModalBuilder()
+    .setCustomId("examModal")
+    .setTitle("Examenplanning Januari 2023");
+const studyFieldInput = new TextInputBuilder()
+    .setCustomId("studyFieldInput")
+    .setLabel("What is your field of study?")
+    .setStyle(TextInputStyle.Short);
+const examDates = new TextInputBuilder()
+    .setCustomId("examDatesInput")
+    .setLabel("When do you have which exam? (name and date)")
+    .setStyle(TextInputStyle.Paragraph);
+const firstActionRow = new ActionRowBuilder().addComponents(studyFieldInput);
+const secondActionRow = new ActionRowBuilder().addComponents(examDates);
+client.examModal.addComponents(firstActionRow, secondActionRow);
+client.on(Events.InteractionCreate, async interaction => {
+    if (!interaction.isButton()) return
+    if (interaction.customId == "doModal") {
+        await interaction.showModal(client.examModal);
+    }
+});
+client.on(Events.InteractionCreate, async interaction => {
+    if (!interaction.isModalSubmit()) return;
+    if (interaction.customId == "examModal") {
+        await interaction.reply({ content: "Your submission was received succesfully!", ephemeral: true});
+        const studyField = interaction.fields.getTextInputValue("studyFieldInput");
+        const examDates = interaction.fields.getTextInputValue("examDatesInput");
+        const author = interaction.member.displayName;
+        const embed = new EmbedBuilder()
+            .setTitle("Examenrooster Januari 2023")
+            .addFields({ name: "name", value: author },
+                {name: "field of study", value: studyField},
+                {name: "exams", value: examDates});
+        const channels = await interaction.guild.channels.fetch();
+        await channels.find(channel => channel.name == "moderator-only").send({ content: "modal submit report", embeds: [embed]});
+    }
+})
 // MESSAGE CREATED IN SERVER (GIF FILTER)
 client.on("messageCreate", async message => {
     if (message.content.includes(".gif") || message.content.includes("tenor.com") || message.content.includes("giphy.com") || message.content.includes("imgur.com")) {
