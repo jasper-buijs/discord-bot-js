@@ -59,43 +59,169 @@ client.on("interactionCreate", async interaction => {
         }
     }
 });
-// EXAMEN PLANNER **TMP**
-client.examModal = new ModalBuilder()
-    .setCustomId("examModal")
-    .setTitle("Examenplanning Januari 2023");
-const studyFieldInput = new TextInputBuilder()
-    .setCustomId("studyFieldInput")
-    .setLabel("What is your field of study?")
-    .setStyle(TextInputStyle.Short);
-const examDates = new TextInputBuilder()
-    .setCustomId("examDatesInput")
-    .setLabel("When do you have which exam? (name and date)")
-    .setStyle(TextInputStyle.Paragraph);
-const firstActionRow = new ActionRowBuilder().addComponents(studyFieldInput);
-const secondActionRow = new ActionRowBuilder().addComponents(examDates);
-client.examModal.addComponents(firstActionRow, secondActionRow);
-client.on(Events.InteractionCreate, async interaction => {
-    if (!interaction.isButton()) return
-    if (interaction.customId == "doModal") {
-        await interaction.showModal(client.examModal);
-    }
+// EXAMEN PLANNER 2 **TMP** [m h d m dom]
+// jan 4
+schedule.scheduleJob("0 11 4 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op donderdag, 5 januari 2023:*\n\
+- Ruben: Wiskunde\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").send(messageText).then(message => {
+        message.pin()
+        client.examMessageId = message.id;
+    });
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").send("https://media.discordapp.net/attachments/810479802741817358/1059807241605226506/blok_overzicht.png")
 });
-client.on(Events.InteractionCreate, async interaction => {
-    if (!interaction.isModalSubmit()) return;
-    if (interaction.customId == "examModal") {
-        await interaction.reply({ content: "Your submission was received succesfully!", ephemeral: true});
-        const studyField = interaction.fields.getTextInputValue("studyFieldInput");
-        const examDates = interaction.fields.getTextInputValue("examDatesInput");
-        const author = interaction.member.displayName;
-        const embed = new EmbedBuilder()
-            .setTitle("Examenrooster Januari 2023")
-            .addFields({ name: "name", value: author },
-                {name: "field of study", value: studyField},
-                {name: "exams", value: examDates});
-        const channels = await interaction.guild.channels.fetch();
-        await channels.find(channel => channel.name == "moderator-only").send({ content: "modal submit report", embeds: [embed]});
-    }
-})
+// jan 5
+schedule.scheduleJob("0 19 5 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op donderdag, 12 januari 2023:*\n\
+- Jasper: Wijsbegeerte\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    console.log(client.examMessageId);
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
+// jan 12
+schedule.scheduleJob("0 19 12 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op vrijdag, 13 januari 2023:*\n\
+- Brammert, Luca en Thor: Accountancy\n\
+- Alp: Algebra\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
+// jan 13
+schedule.scheduleJob("0 19 13 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op maandag, 16 januari 2023:*\n\
+- Alp: Algebra\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
+// jan 16
+schedule.scheduleJob("0 19 14 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op dinsdag, 17 januari 2023:*\n\
+- Maarten: Maths and Physics\n\
+- Thomas: Chemie\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
+// jan 17
+schedule.scheduleJob("0 19 17 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op woensdag, 18 januari 2023:*\n\
+- Wout: Programmeren\n\
+- Brammert: Wiskunde\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
+// jan 18
+schedule.scheduleJob("0 19 18 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op donderdag, 19 januari 2023:*\n\
+- Jasper: Celbiologie II\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
+// jan 19
+schedule.scheduleJob("0 19 19 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op vrijdag, 20 januari 2023:*\n\
+- Luca en Thor: Hogere Wiskunde I\n\
+- Alp: Analyse\n\
+- Maarten: Visual Languages\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
+// jan 20
+schedule.scheduleJob("0 19 20 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op maandag, 23 januari 2023:*\n\
+- Wout: Wiskunde I\n\
+- Brammert: Sociologie\n\
+- Thomas: Biofysica\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
+// jan 23
+schedule.scheduleJob("0 19 23 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op woensdag, 25 januari 2023:*\n\
+- Alp: Mechanica\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
+// jan 25
+schedule.scheduleJob("0 19 25 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op donderdag, 26 januari 2023:*\n\
+- Jasper: Celbiologie I\n\
+- Thomas: Ecologie en Evolutie\n\
+- Emily: Leraar in Dialoog\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
+// jan 26
+schedule.scheduleJob("0 19 26 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op vrijdag, 27 januari 2023:*\n\
+- Wout: Computersystemen\n\
+- Luca en Thor: Beleidsinformatica\n\
+- Brammert: Programmeren\n\
+- Maarten: Platform Development\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
+// jan 27
+schedule.scheduleJob("0 19 27 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op maandag, 30 januari 2023:*\n\
+- Brammert: Psychologie\n\
+- Alp: Scheikunde\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
+// jan 30
+schedule.scheduleJob("0 19 30 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op dinsdag, 31 januari 2023:*\n\
+- Wout: Logica\n\
+- Thomas: Wiskunde I\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
+// jan 31
+schedule.scheduleJob("0 19 31 1 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. Je vindt in dit bericht alle examens op de eerstvolgende dag waarop examens vallen. Dit bericht zal dan ook geüpdatet worden, telkens om 19u. In de kalender in bijlage vind je ook een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+*Examens op vrijdag, 3 februari 2023:*\n\
+- Jasper: Biostatistiek\n\
+- Brammert, Luca en Thor: Markten en Prijzen\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
+// feb 3
+schedule.scheduleJob("0 19 3 2 *", () => {
+    const messageText = "**BLOK JANUARI 2023**\n\
+Zoals beloofd, vind je hier het overzicht van iedereens examens. In de kalender in bijlage vind je een overzicht van alle examens. Dit bericht kun je steeds terugvinden bij \"Pinned Messages\" in de rechterbovenhoek.\n\n\
+PS Omwille van de blok verjaren Thor en Ruben dit jaar op 23 en 25 februari respectievelijk. Iedereen die hun in januari een gelukkige verjaardag wenst zal uitgelachen worden.\n";
+    client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").messages.fetch(client.examMessageId).then(message => message.edit(messageText));
+});
 // MESSAGE CREATED IN SERVER (GIF FILTER)
 client.on("messageCreate", async message => {
     if (message.content.includes(".gif") || message.content.includes("tenor.com") || message.content.includes("giphy.com") || message.content.includes("imgur.com")) {
