@@ -36,7 +36,11 @@ module.exports = {
         }).then(result => result.tracks[0]);
         if (!track) return await interaction.editReply({ content: `I could not find anything for "${query}".` });
         // longer than 15:00 song
-        if (Number(track.duration.split(":").slice(-2)[0]) >= 14) {
+        let trackDurationSeconds = 0
+        for (let i = 0; i < track.duration.split(":").length; i++) {
+            trackDurationSeconds = trackDurationSeconds*60 + Number(track.duration.split(":")[i]);
+        }
+        if (trackDurationSeconds >= 899) {
             if (!client.queue.tracks.length && !client.queue.playing) await client.queue.destroy(true);
             interactionToDelete = await interaction.editReply({ content: `I can't play songs that are longer than 15 minutes. That song was ${track.duration} long.` });
             setTimeout(async function(message){
@@ -44,7 +48,7 @@ module.exports = {
             }, 15000, interactionToDelete);
             return interactionToDelete;
         }
-        // longer than 15:00 queue
+        // longer than 15:00 queue (This only works becquse if the length goes qbove one hour, it would hqve been stopped above. Shit code!)
         let queueLength = Number(track.duration.split(":").slice(-2)[0])*60;
         queueLength += Number(track.duration.split(":").slice(-2)[1]);
         if (client.queue.nowPlaying()) {
@@ -66,6 +70,7 @@ module.exports = {
         }
         // play
         client.queue.play(track);
+        console.log("got here [1]");
         return await interaction.editReply({ content: `I'm loading your song "${track.title}".`});
     }
 }
