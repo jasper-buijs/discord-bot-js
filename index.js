@@ -1,16 +1,19 @@
 // IMPORT PACKAGES
 const schedule = require("node-schedule");
-const { Client, GatewayIntentBits, Collection, InteractionType, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { Client, GatewayIntentBits, Collection, InteractionType, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, Events, EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 const { Player } = require("discord-player");
 const { token, clientId, guildId } = require("./config.json");
 // DECLARATIONS
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.MessageContent] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.MessageContent] });
 client.player = new Player(client);
 client.messageReports = new Array();
 client.userReports = new Array();
 client.temporaryVoiceChannels = new Array();
 client.gifSpamViolationTracker = new Array();
+client.formula1LiveData = {
+    active: false
+}
 client.commands = new Collection();
 const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
 for (const file of commandFiles) {
@@ -131,6 +134,7 @@ client.on("interactionCreate", async interaction => {
 });
 // WHEN SONG STARTS TO PLAY
 client.player.on("trackStart", async function(queue, track) {
+    console.log("got here [0]");
     const controlButtons = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId("playPause").setEmoji("⏯").setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setCustomId("stop").setEmoji("⏹️").setStyle(ButtonStyle.Secondary),
@@ -145,6 +149,16 @@ client.player.on("trackEnd", async function(queue, track) {
     setTimeout(async function(message){
         await message.delete();
     }, 15000, client.player.musicAnnounceMessage);
+});
+// MUSIC ERRORS
+client.player.on("error", (queue, error) => {
+    console.log(`> ERROR PLAYING MUSIC:\n${error}`);
+});
+client.player.on("connectionError", (queue, error) => {
+    console.log(`> ERROR PLAYING MUSIC, connection error:\n${error}`);
+});
+client.player.on("debug", (queue, debug) => {
+    console.log(`> DEBUG PLAYING MUSIC:\n${debug}`);
 });
 // EVERY DAY AT MIDNIGHT (CLEAR GIF VIOLATIONS AND VOICE CHANNEL TEXT CHANNELS)
 schedule.scheduleJob("0 0 * * *", () => {
