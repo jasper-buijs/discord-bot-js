@@ -134,7 +134,6 @@ client.on("interactionCreate", async interaction => {
 });
 // WHEN SONG STARTS TO PLAY
 client.player.on("trackStart", async function(queue, track) {
-    console.log("got here [0]");
     const controlButtons = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId("playPause").setEmoji("⏯").setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setCustomId("stop").setEmoji("⏹️").setStyle(ButtonStyle.Secondary),
@@ -156,9 +155,6 @@ client.player.on("error", (queue, error) => {
 });
 client.player.on("connectionError", (queue, error) => {
     console.log(`> ERROR PLAYING MUSIC, connection error:\n${error}`);
-});
-client.player.on("debug", (queue, debug) => {
-    console.log(`> DEBUG PLAYING MUSIC:\n${debug}`);
 });
 // EVERY DAY AT MIDNIGHT (CLEAR GIF VIOLATIONS AND VOICE CHANNEL TEXT CHANNELS)
 schedule.scheduleJob("0 0 * * *", () => {

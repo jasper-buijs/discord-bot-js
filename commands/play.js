@@ -70,7 +70,6 @@ module.exports = {
         }
         // play
         client.queue.play(track);
-        console.log("got here [1]");
         return await interaction.editReply({ content: `I'm loading your song "${track.title}".`});
     }
 }

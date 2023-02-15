@@ -3,18 +3,6 @@ const { SlashCommandBuilder, PermissionFlagsBits, ThreadAutoArchiveDuration, Cha
 const { request, GraphQLClient, gql } = require("graphql-request");
 const { clientId, guildId } = require("../config.json");
 const schedule = require("node-schedule");
-/*import {
-    discoverF1MVInstances,
-    getAPIVersion,
-    getF1MVVersion,
-    LiveTimingAPIGraphQL,
-} from "npm_f1mv_api";*/
-//import Discord from "discord.js";
-/*import {
-    SlashCommandBuilder,
-    PermissionFlagsBits
-} from "discors.js";*/
-//const {discoverF1MVInstances, getAPIVersion, getF1MVVersion, LiveTimingAPIGraphQL} = require("npm_f1mv_api");
 module.exports = {
     data: new SlashCommandBuilder().setName("formula1").setDescription("Behind the scenes commands for F1 2023.").setDefaultMemberPermissions(PermissionFlagsBits.Administrator).addSubcommandGroup(group =>
         group.setName("live-session").setDescription("Link to Multiviewer for F1 for live broadcast.").addSubcommand(command =>
@@ -29,35 +17,6 @@ module.exports = {
         await interaction.deferReply({ephemeral: true});
         if (interaction.options.getSubcommandGroup() == "live-session") {
             if (interaction.options.getSubcommand() == "start") {
-                /*console.log("got here [0]");
-                import("npm_f1mv_api").then(async (npm_f1_mv) => {
-                    console.log("got here [1]");
-                    let port;
-
-                    try {
-                        port = (await npm_f1_mv.discoverF1MVInstances("127.0.0.1")).port;
-                        console.log("got here [3]");
-                    } catch (error) {
-                        console.error(
-                            "No MultiViewer instances founded on the requested host. Check if MultiViewer is running or if MultiViewer is allowed in your FireWall rules."
-                        );
-                        return;
-                    }
-
-                    const config = {
-                        host: "127.0.0.1",
-                        port: port,
-                    };
-
-                    console.log(await npm_f1_mv.discoverF1MVInstances(config.host));
-                    console.log(await npm_f1_mv.getF1MVVersion(config));
-                    console.log(await npm_f1_mv.getAPIVersion(config));
-                    //console.log(await LiveTimingAPIV1(config, "TrackStatus"));
-                    //console.log(await LiveTimingAPIV2(config, ["TrackStatus", "WeatherData"]));
-                    console.log(
-                        await npm_f1_mv.LiveTimingAPIGraphQL(config, ["TrackStatus", "WeatherData"])
-                    );
-                });*/
                 const ip = interaction.options.getString("ip") ?? "192.168.0.156";
                 const port = "10101";
                 const source = String("http://" + ip + ":" + port + "/api/graphql");
@@ -81,24 +40,16 @@ module.exports = {
                         WeatherData
                     }
                 }`;
-                //client.request(query).then((data) => console.log(data));
                 let data = new Object();
                 try {
                     data = await apiClient.request(query);
-                    console.log(data);
                 } catch {
                     console.log("> ERROR could not find graphql api");
                     return interaction.editReply({ content: "Could not find graphql api.", ephemeral: true });
                 }
                 while (!data.liveTimingClock && !data.liveTimingState.ExtrapolatedClock && !data.liveTimingState.RaceControlMessages && !data.liveTimingState.SessionData && !data.liveTimingState.SessionInfo && !data.liveTimingState.TrackStatus && !data.liveTimingState.WeatherData) {
-                    console.log("not everything, retrying");
                     data = await apiClient.request(query);
                 }
-                console.log("got everything, launching");
-                /*client.formula1LiveData = {
-                    lastRCMessageIndex: -1,
-                    active: true
-                }*/
                 client.formula1LiveData.lastRCMessageIndex = -1;
                 client.formula1LiveData.active = true
                 const thread = await client.guilds.cache.get(guildId).channels.cache.find(channel => channel.name == "general").threads.create({
@@ -190,9 +141,6 @@ module.exports = {
                         else message = String(":white_small_square: " + message);
                         if (!message.includes("BLUE FLAG")) await discordMessage.edit({ content: message }); // HIDE BLUE FLAGS
                     }
-                    /*if (!client.formula1LiveData.active) {
-                        client.formula1LiveData.apiJob.gracefulShutdown(); // can't destroy fromp inside
-                    }*/
                 });
             } else if (interaction.options.getSubcommand() == "stop") {
                 client.formula1LiveData.active = false;
