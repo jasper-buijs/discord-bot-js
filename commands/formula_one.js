@@ -1,18 +1,47 @@
 const Discord = require("discord.js");
-const { SlashCommandBuilder, PermissionFlagsBits, ThreadAutoArchiveDuration, ChannelType, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ThreadAutoArchiveDuration, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { request, GraphQLClient, gql } = require("graphql-request");
 const { clientId, guildId } = require("../config.json");
 const schedule = require("node-schedule");
 module.exports = {
     data: new SlashCommandBuilder().setName("formula1").setDescription("Behind the scenes commands for F1 2023.").setDefaultMemberPermissions(PermissionFlagsBits.Administrator).addSubcommandGroup(group =>
         group.setName("live-session").setDescription("Link to Multiviewer for F1 for live broadcast.").addSubcommand(command =>
-            command.setName("start").setDescription("Link Multiviewer for F1 for a live session").addStringOption(option =>
-                option.setName("flag-message-id").setDescription("ID of the message where flags should be displayed.").setRequired(true)).addStringOption(option =>
+            command.setName("start").setDescription("Link Multiviewer for F1 for a live session.").addStringOption(option =>
                 option.setName("event-id").setDescription("ID of the Discord Event for the session.").setRequired(true)).addStringOption(option =>
                 option.setName("ip").setDescription("IP adress where F1MV is running.").setRequired(false))).addSubcommand(command =>
-            command.setName("stop").setDescription("Stop the link with F1MV.").addStringOption(option =>
-                option.setName("image-url").setDescription("URL of image to be reinstated.").setRequired(true)).addStringOption(option =>
-                option.setName("flag-message-id").setDescription("ID of the message to be reinstated.").setRequired(false)))),
+            command.setName("stop").setDescription("Stop the link with F1MV."))).addSubcommandGroup(group =>
+        group.setName("message").setDescription("Send an F1 graphic in this channel with buttons.").addSubcommand(command =>
+            command.setName("circuit").setDescription("Send the Circuit graphic in this channel.").addAttachmentOption(option =>
+                option.setName("graphic").setDescription("The graphic to send in this channel.").setRequired(true)).addStringOption(option =>
+                option.setName("url").setDescription("The url to the circuit information.").setRequired(true))).addSubcommand(command =>
+            command.setName("grid").setDescription("Send the Starting Grid graphic in this channel.").addAttachmentOption(option =>
+                option.setName("graphic").setDescription("The graphic to send in this channel.").setRequired(true)).addStringOption(option =>
+                option.setName("qualy-url").setDescription("The url to the qualifying results.").setRequired(true)).addStringOption(option =>
+                option.setName("grid-url").setDescription("The url to the starting grid.").setRequired(true))).addSubcommand(command =>
+            command.setName("result").setDescription("Send the Race Result graphic in this channel.").addAttachmentOption(option =>
+                option.setName("graphic").setDescription("The graphic to send in this channel.").setRequired(true)).addStringOption(option =>
+                option.setName("result-url").setDescription("The url to the race results.").setRequired(true)).addStringOption(option =>
+                option.setName("report-url").setDescription("The url to the race report.").setRequired(true)).addStringOption(option =>
+                option.setName("highlights-url").setDescription("The url to the highlights.").setRequired(false))).addSubcommand(command =>
+            command.setName("penalty").setDescription("Send the Penalty graphic in this channel.").addAttachmentOption(option =>
+                option.setName("graphic").setDescription("The graphic to send in this channel.").setRequired(true)).addStringOption(option =>
+                option.setName("url").setDescription("The url to the penalty report.").setRequired(true))).addSubcommand(command =>
+            command.setName("other").setDescription("Send the Race Result graphic in this channel.").addAttachmentOption(option =>
+                option.setName("graphic").setDescription("The graphic to send in this channel.").setRequired(true)).addStringOption(option =>
+                option.setName("button1-label").setDescription("The label for the first button.").setRequired(false)).addStringOption(option =>
+                option.setName("button1-url").setDescription("The url for the first button.").setRequired(false)).addStringOption(option =>
+                option.setName("button2-label").setDescription("The label for the second button.").setRequired(false)).addStringOption(option =>
+                option.setName("button2-url").setDescription("The url for the second button.").setRequired(false)).addStringOption(option =>
+                option.setName("button3-label").setDescription("The label for the third button.").setRequired(false)).addStringOption(option =>
+                option.setName("button3-url").setDescription("The url for the third button.").setRequired(false))).addSubcommand(command =>
+            command.setName("news").setDescription("Send the Race Result graphic in this channel.").addAttachmentOption(option =>
+                option.setName("graphic").setDescription("The graphic to send in this channel.").setRequired(true)).addStringOption(option =>
+                option.setName("button1-label").setDescription("The label for the first button.").setRequired(false)).addStringOption(option =>
+                option.setName("button1-url").setDescription("The url for the first button.").setRequired(false)).addStringOption(option =>
+                option.setName("button2-label").setDescription("The label for the second button.").setRequired(false)).addStringOption(option =>
+                option.setName("button2-url").setDescription("The url for the second button.").setRequired(false)).addStringOption(option =>
+                option.setName("button3-label").setDescription("The label for the third button.").setRequired(false)).addStringOption(option =>
+                option.setName("button3-url").setDescription("The url for the third button.").setRequired(false)))),
     async execute(client, interaction) {
         await interaction.deferReply({ephemeral: true});
         if (interaction.options.getSubcommandGroup() == "live-session") {
@@ -61,9 +90,12 @@ module.exports = {
                 await interaction.editReply({ content: `A thread has been created for race control messages: <#${thread.id}>.`, ephemeral: true });
                 await client.guilds.cache.get(guildId).members.fetch();
                 await client.guilds.cache.get(guildId).roles.fetch();
-                await client.guilds.cache.get(guildId).members.cache.filter(member => member.roles.cache.find(role => role.name == "Formula 1")).forEach(member => {
+                /*await client.guilds.cache.get(guildId).members.cache.filter(member => member.roles.cache.find(role => role.name == "Formula 1")).forEach(member => {
                     thread.members.add(member.id);
-                });
+                });*/
+                await Promise.all(client.guilds.cache.get(guildId).members.cache.filter(member => member.roles.cache.find(role => role.name == "Formula 1")).map(async (member) => {
+                    await thread.members.add(member.id);
+                }))
                 await client.guilds.cache.get(guildId).scheduledEvents.fetch(true);
                 await thread.send({ content: await client.guilds.cache.get(guildId).scheduledEvents.cache.get(interaction.options.getString("event-id")).url ?? "did not find event url" });
                 const windDirections = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
@@ -97,6 +129,17 @@ module.exports = {
                         ttsMessage = await ttsMessage.replace(/(car)?(s)?\s[0-9]{1,2}\s\((tsu)\)/g, "Tsunoda");
                         ttsMessage = await ttsMessage.replace(/(car)?(s)?\s[0-9]{1,2}\s\((alb)\)/g, "Albon");
                         ttsMessage = await ttsMessage.replace(/(car)?(s)?\s[0-9]{1,2}\s\((sar)\)/g, "Sargeant");
+                        ttsMessage = await ttsMessage.replace(/(car)?(s)?\s[0-9]{1,2}\s\((msc)\)/g, "Schumacher");
+                        ttsMessage = await ttsMessage.replace(/(car)?(s)?\s[0-9]{1,2}\s\((gio)\)/g, "Giovinazzi");
+                        ttsMessage = await ttsMessage.replace(/(car)?(s)?\s[0-9]{1,2}\s\((shw)\)/g, "Shwartzman");
+                        ttsMessage = await ttsMessage.replace(/(car)?(s)?\s[0-9]{1,2}\s\((ric)\)/g, "Ricciardo");
+                        ttsMessage = await ttsMessage.replace(/(car)?(s)?\s[0-9]{1,2}\s\((law)\)/g, "Lawson");
+                        ttsMessage = await ttsMessage.replace(/(car)?(s)?\s[0-9]{1,2}\s\((pal)\)/g, "Palou");
+                        ttsMessage = await ttsMessage.replace(/(car)?(s)?\s[0-9]{1,2}\s\((van)\)/g, "Vandoorne");
+                        ttsMessage = await ttsMessage.replace(/(car)?(s)?\s[0-9]{1,2}\s\((dru)\)/g, "Drugovich");
+                        ttsMessage = await ttsMessage.replace(/(car)?(s)?\s[0-9]{1,2}\s\((pou)\)/g, "Pourchaire");
+                        ttsMessage = await ttsMessage.replace(/(car)?(s)?\s[0-9]{1,2}\s\((fit)\)/g, "Fittipaldi");
+                        ttsMessage = await ttsMessage.replace(/(car)?(s)?\s[0-9]{1,2}\s\((doo)\)/g, "Doohan");
                         ttsMessage = await ttsMessage.replace(" drs ", " DRS ");
                         let discordMessage;
                         if (!message.includes("BLUE FLAG")) discordMessage = await thread.send({ content: ttsMessage, tts: true }); // HIDE BLUE FLAGS
@@ -146,6 +189,170 @@ module.exports = {
                 client.formula1LiveData.active = false;
                 await client.formula1LiveData.apiJob.cancel();
                 await interaction.editReply({ content: "Live conection stopped.", ephemeral: true });
+            }
+        } else if (interaction.options.getSubcommandGroup() == "message") {
+            if (interaction.options.getSubcommand() == "circuit") {
+                if (interaction.channel.isThread()) {
+                    await client.guilds.cache.get(guildId).channels.fetch(interaction.channel.parentId);
+                    const parentChannel = client.guilds.cache.get(guildId).channels.cache.get(interaction.channel.parentId);
+                    const webhook = await parentChannel.createWebhook({ name: "Formula 1 #results", avatar: "https://media.discordapp.net/attachments/842889568922632237/1080468629495238737/f1logo_webhook.png" });
+                    const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Circuit Stats").setURL(interaction.options.getString("url")));
+                    await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "circuit.png" }], threadId: interaction.channelId });
+                    await webhook.delete();
+                    await interaction.editReply({ content: "Your're message has been send.", ephemeral: true });
+                } else {
+                    await client.guilds.cache.get(guildId).channels.fetch(interaction.channelId);
+                    const channel = client.guilds.cache.get(guildId).channels.cache.get(interaction.channelId);
+                    const webhook = await channel.createWebhook({ name: "Formula 1 #results", avatar: "https://media.discordapp.net/attachments/842889568922632237/1080468629495238737/f1logo_webhook.png" });
+                    const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Circuit Stats").setURL(interaction.options.getString("url")));
+                    await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "circuit.png" }] });
+                    await webhook.delete();
+                    await interaction.editReply({ content: "Your're message has been send.", ephemeral: true });
+                }
+            } else if (interaction.options.getSubcommand() == "grid") {
+                if (interaction.channel.isThread()) {
+                    await client.guilds.cache.get(guildId).channels.fetch(interaction.channel.parentId);
+                    const parentChannel = client.guilds.cache.get(guildId).channels.cache.get(interaction.channel.parentId);
+                    const webhook = await parentChannel.createWebhook({ name: "Formula 1 #results", avatar: "https://media.discordapp.net/attachments/842889568922632237/1080468629495238737/f1logo_webhook.png" });
+                    const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Qualifying Results").setURL(interaction.options.getString("qualy-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Starting Grid").setURL(interaction.options.getString("grid-url")));
+                    await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "starting-grid.png" }], threadId: interaction.channelId });
+                    await webhook.delete();
+                    await interaction.editReply({ content: "Your're message has been send.", ephemeral: true });
+                } else {
+                    await client.guilds.cache.get(guildId).channels.fetch(interaction.channelId);
+                    const channel = client.guilds.cache.get(guildId).channels.cache.get(interaction.channelId);
+                    const webhook = await channel.createWebhook({ name: "Formula 1 #results", avatar: "https://media.discordapp.net/attachments/842889568922632237/1080468629495238737/f1logo_webhook.png" });
+                    const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Qualifying Results").setURL(interaction.options.getString("qualy-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Starting Grid").setURL(interaction.options.getString("grid-url")));
+                    await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "starting-grid.png" }] });
+                    await webhook.delete();
+                    await interaction.editReply({ content: "Your're message has been send.", ephemeral: true });
+                }
+            } else if (interaction.options.getSubcommand() == "result") {
+                if (interaction.channel.isThread()) {
+                    await client.guilds.cache.get(guildId).channels.fetch(interaction.channel.parentId);
+                    const parentChannel = client.guilds.cache.get(guildId).channels.cache.get(interaction.channel.parentId);
+                    const webhook = await parentChannel.createWebhook({ name: "Formula 1 #results", avatar: "https://media.discordapp.net/attachments/842889568922632237/1080468629495238737/f1logo_webhook.png" });
+                    //const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Qualifying Results").setURL(interaction.options.getString("qualy-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Starting Grid").setURL(interaction.options.getString("grid-url")));
+                    var buttons = new String();
+                    if (interaction.options.getString("highlights-url")) { buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Race Results").setURL(interaction.options.getString("result-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Race Report").setURL(interaction.options.getString("report-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Highlights").setURL(interaction.options.getString("highlights-url"))); }
+                    else { buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Race Results").setURL(interaction.options.getString("result-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Race Report").setURL(interaction.options.getString("report-url"))); }
+                    await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "race-results.png" }], threadId: interaction.channelId });
+                    await webhook.delete();
+                    await interaction.editReply({ content: "Your're message has been send.", ephemeral: true });
+                } else {
+                    await client.guilds.cache.get(guildId).channels.fetch(interaction.channelId);
+                    const channel = client.guilds.cache.get(guildId).channels.cache.get(interaction.channelId);
+                    const webhook = await channel.createWebhook({ name: "Formula 1 #results", avatar: "https://media.discordapp.net/attachments/842889568922632237/1080468629495238737/f1logo_webhook.png" });
+                    //const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Qualifying Results").setURL(interaction.options.getString("qualy-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Starting Grid").setURL(interaction.options.getString("grid-url")));
+                    var buttons = new String();
+                    if (interaction.options.getString("highlights-url")) { buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Race Results").setURL(interaction.options.getString("result-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Race Report").setURL(interaction.options.getString("report-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Highlights").setURL(interaction.options.getString("highlights-url"))); }
+                    else { buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Race Results").setURL(interaction.options.getString("result-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Race Report").setURL(interaction.options.getString("report-url"))); }
+                    await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "race-results.png" }] });
+                    await webhook.delete();
+                    await interaction.editReply({ content: "Your're message has been send.", ephemeral: true });
+                }
+            } else if (interaction.options.getSubcommand() == "penalty") {
+                if (interaction.channel.isThread()) {
+                    await client.guilds.cache.get(guildId).channels.fetch(interaction.channel.parentId);
+                    const parentChannel = client.guilds.cache.get(guildId).channels.cache.get(interaction.channel.parentId);
+                    const webhook = await parentChannel.createWebhook({ name: "Formula 1 #results", avatar: "https://media.discordapp.net/attachments/842889568922632237/1080468629495238737/f1logo_webhook.png" });
+                    const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Penalty Report").setURL(interaction.options.getString("url")));
+                    await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "penalty.png" }], threadId: interaction.channelId });
+                    await webhook.delete();
+                    await interaction.editReply({ content: "Your're message has been send.", ephemeral: true });
+                } else {
+                    await client.guilds.cache.get(guildId).channels.fetch(interaction.channelId);
+                    const channel = client.guilds.cache.get(guildId).channels.cache.get(interaction.channelId);
+                    const webhook = await channel.createWebhook({ name: "Formula 1 #results", avatar: "https://media.discordapp.net/attachments/842889568922632237/1080468629495238737/f1logo_webhook.png" });
+                    const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Penalty Report").setURL(interaction.options.getString("url")));
+                    await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "penalty.png" }] });
+                    await webhook.delete();
+                    await interaction.editReply({ content: "Your're message has been send.", ephemeral: true });
+                }
+            } else if (interaction.options.getSubcommand() == "other") {
+                if (interaction.channel.isThread()) {
+                    await client.guilds.cache.get(guildId).channels.fetch(interaction.channel.parentId);
+                    const parentChannel = client.guilds.cache.get(guildId).channels.cache.get(interaction.channel.parentId);
+                    const webhook = await parentChannel.createWebhook({ name: "Formula 1 #results", avatar: "https://media.discordapp.net/attachments/842889568922632237/1080468629495238737/f1logo_webhook.png" });
+                    //const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Circuit Stats").setURL(interaction.options.getString("url")));
+                    //await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }], threadId: interaction.channelId });
+                    if (!(interaction.options.getString("button1-label") && interaction.options.getString("button1-url"))) {
+                        await webhook.send({ files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }], threadId: interaction.channelId });
+                    } else if (!(interaction.options.getString("button2-label") && interaction.options.getString("button2-url"))) {
+                        const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button1-label")).setURL(interaction.options.getString("button1-url")));
+                        await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }], threadId: interaction.channelId });
+                    } else if (!(interaction.options.getString("button3-label") && interaction.options.getString("button3-url"))) {
+                        const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button1-label")).setURL(interaction.options.getString("button1-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button2-label")).setURL(interaction.options.getString("button2-url")));
+                        await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }], threadId: interaction.channelId });
+                    } else {
+                        const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button1-label")).setURL(interaction.options.getString("button1-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button2-label")).setURL(interaction.options.getString("button2-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button3-label")).setURL(interaction.options.getString("button3-url")));
+                        await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }], threadId: interaction.channelId });
+                    } 
+                    await webhook.delete();
+                    await interaction.editReply({ content: "Your're message has been send.", ephemeral: true });
+                } else {
+                    await client.guilds.cache.get(guildId).channels.fetch(interaction.channelId);
+                    const channel = client.guilds.cache.get(guildId).channels.cache.get(interaction.channelId);
+                    const webhook = await channel.createWebhook({ name: "Formula 1 #results", avatar: "https://media.discordapp.net/attachments/842889568922632237/1080468629495238737/f1logo_webhook.png" });
+                    //const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Circuit Stats").setURL(interaction.options.getString("url")));
+                    //await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }] });
+                    if (!(interaction.options.getString("button1-label") && interaction.options.getString("button1-url"))) {
+                        await webhook.send({ files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }], threadId: interaction.channelId });
+                    } else if (!(interaction.options.getString("button2-label") && interaction.options.getString("button2-url"))) {
+                        const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button1-label")).setURL(interaction.options.getString("button1-url")));
+                        await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }] });
+                    } else if (!(interaction.options.getString("button3-label") && interaction.options.getString("button3-url"))) {
+                        const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button1-label")).setURL(interaction.options.getString("button1-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button2-label")).setURL(interaction.options.getString("button2-url")));
+                        await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }] });
+                    } else {
+                        const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button1-label")).setURL(interaction.options.getString("button1-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button2-label")).setURL(interaction.options.getString("button2-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button3-label")).setURL(interaction.options.getString("button3-url")));
+                        await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }] });
+                    }
+                    await webhook.delete();
+                    await interaction.editReply({ content: "Your're message has been send.", ephemeral: true });
+                }
+            } else if (interaction.options.getSubcommand() == "news") {
+                if (interaction.channel.isThread()) {
+                    await client.guilds.cache.get(guildId).channels.fetch(interaction.channel.parentId);
+                    const parentChannel = client.guilds.cache.get(guildId).channels.cache.get(interaction.channel.parentId);
+                    const webhook = await parentChannel.createWebhook({ name: "Formula 1 #news", avatar: "https://media.discordapp.net/attachments/842889568922632237/1080468629495238737/f1logo_webhook.png" });
+                    //const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Circuit Stats").setURL(interaction.options.getString("url")));
+                    //await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }], threadId: interaction.channelId });
+                    if (!(interaction.options.getString("button1-label") && interaction.options.getString("button1-url"))) {
+                        await webhook.send({ files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }], threadId: interaction.channelId });
+                    } else if (!(interaction.options.getString("button2-label") && interaction.options.getString("button2-url"))) {
+                        const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button1-label")).setURL(interaction.options.getString("button1-url")));
+                        await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }], threadId: interaction.channelId });
+                    } else if (!(interaction.options.getString("button3-label") && interaction.options.getString("button3-url"))) {
+                        const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button1-label")).setURL(interaction.options.getString("button1-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button2-label")).setURL(interaction.options.getString("button2-url")));
+                        await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }], threadId: interaction.channelId });
+                    } else {
+                        const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button1-label")).setURL(interaction.options.getString("button1-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button2-label")).setURL(interaction.options.getString("button2-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button3-label")).setURL(interaction.options.getString("button3-url")));
+                        await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }], threadId: interaction.channelId });
+                    } 
+                    await webhook.delete();
+                    await interaction.editReply({ content: "Your're message has been send.", ephemeral: true });
+                } else {
+                    await client.guilds.cache.get(guildId).channels.fetch(interaction.channelId);
+                    const channel = client.guilds.cache.get(guildId).channels.cache.get(interaction.channelId);
+                    const webhook = await channel.createWebhook({ name: "Formula 1 #news", avatar: "https://media.discordapp.net/attachments/842889568922632237/1080468629495238737/f1logo_webhook.png" });
+                    //const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Circuit Stats").setURL(interaction.options.getString("url")));
+                    //await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }] });
+                    if (!(interaction.options.getString("button1-label") && interaction.options.getString("button1-url"))) {
+                        await webhook.send({ files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }], threadId: interaction.channelId });
+                    } else if (!(interaction.options.getString("button2-label") && interaction.options.getString("button2-url"))) {
+                        const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button1-label")).setURL(interaction.options.getString("button1-url")));
+                        await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }] });
+                    } else if (!(interaction.options.getString("button3-label") && interaction.options.getString("button3-url"))) {
+                        const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button1-label")).setURL(interaction.options.getString("button1-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button2-label")).setURL(interaction.options.getString("button2-url")));
+                        await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }] });
+                    } else {
+                        const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button1-label")).setURL(interaction.options.getString("button1-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button2-label")).setURL(interaction.options.getString("button2-url")), new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button3-label")).setURL(interaction.options.getString("button3-url")));
+                        await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }] });
+                    }
+                    await webhook.delete();
+                    await interaction.editReply({ content: "Your're message has been send.", ephemeral: true });
+                }
             }
         }
     }
