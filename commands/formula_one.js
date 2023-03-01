@@ -196,7 +196,7 @@ module.exports = {
                     await client.guilds.cache.get(guildId).channels.fetch(interaction.channel.parentId);
                     const parentChannel = client.guilds.cache.get(guildId).channels.cache.get(interaction.channel.parentId);
                     const webhook = await parentChannel.createWebhook({ name: "Formula 1 #results", avatar: "https://media.discordapp.net/attachments/842889568922632237/1080468629495238737/f1logo_webhook.png" });
-                    const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Circuit Stats").setURL(interaction.options.getString("url")));
+                    const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Circuit Statistics").setURL(interaction.options.getString("url")));
                     await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "circuit.png" }], threadId: interaction.channelId });
                     await webhook.delete();
                     await interaction.editReply({ content: "Your're message has been send.", ephemeral: true });
@@ -204,7 +204,7 @@ module.exports = {
                     await client.guilds.cache.get(guildId).channels.fetch(interaction.channelId);
                     const channel = client.guilds.cache.get(guildId).channels.cache.get(interaction.channelId);
                     const webhook = await channel.createWebhook({ name: "Formula 1 #results", avatar: "https://media.discordapp.net/attachments/842889568922632237/1080468629495238737/f1logo_webhook.png" });
-                    const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Circuit Stats").setURL(interaction.options.getString("url")));
+                    const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Circuit Statistics").setURL(interaction.options.getString("url")));
                     await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "circuit.png" }] });
                     await webhook.delete();
                     await interaction.editReply({ content: "Your're message has been send.", ephemeral: true });
