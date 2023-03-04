@@ -1,5 +1,5 @@
 const Discord = require("discord.js");
-const { SlashCommandBuilder, PermissionFlagsBits, ThreadAutoArchiveDuration, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ThreadAutoArchiveDuration, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle, GuildScheduledEventStatus } = require('discord.js');
 const { request, GraphQLClient, gql } = require("graphql-request");
 const { clientId, guildId } = require("../config.json");
 const schedule = require("node-schedule");
@@ -97,7 +97,12 @@ module.exports = {
                     await thread.members.add(member.id);
                 }))
                 await client.guilds.cache.get(guildId).scheduledEvents.fetch(true);
-                await thread.send({ content: await client.guilds.cache.get(guildId).scheduledEvents.cache.get(interaction.options.getString("event-id")).url ?? "did not find event url" });
+                client.formula1LiveData.event = await client.guilds.cache.get(guildId).scheduledEvents.cache.get(interaction.options.getString("event-id"));
+                const eventStartTime = await client.formula1LiveData.event.scheduledStartAt;
+                schedule.scheduleJob(eventStartTime, async function() {
+                    await client.formula1LiveData.event.setStatus(GuildScheduledEventStatus.Active);
+                });
+                await thread.send({ content: await client.formula1LiveData.event.url ?? "did not find event url" });
                 const windDirections = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
                 const windDirection = windDirections[(Math.round(Number(data.liveTimingState.WeatherData.WindDirection * 8 / 360), 0) + 8)%8];
                 await thread.send({ content: `**CURRENT CONDITIONS:**\nAir Temperature: ${data.liveTimingState.WeatherData.AirTemp}°C\nTrack Temperature: ${data.liveTimingState.WeatherData.TrackTemp}°C\nHumidity: ${data.liveTimingState.WeatherData.Humidity}%\nPressure: ${data.liveTimingState.WeatherData.Pressure}hPa\nRain: ${String(Boolean(Number(data.liveTimingState.WeatherData.Rainfall)))}\nWind Direction: ${windDirection}\nWind Speed: ${data.liveTimingState.WeatherData.WindSpeed}kph\n**TTS INFORMATION**\nThe race control messages also support Text To Speech.\nTo enable it, make sure tts is enabled in \`User Settings\`>\`Accessibility\`>\`Text-To-Speech\`.\nThen, pop out the live stream to a diffrent window and make sure this channel is focused in Discord.` });
