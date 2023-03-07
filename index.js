@@ -116,24 +116,28 @@ client.on("voiceStateUpdate", async function(oldMember, newMember) {
 client.on("interactionCreate", async interaction => {
     if (!interaction.isButton()) return;
     if (!client.queue) return;
+    //await interaction.deferUpdate();
     if (interaction.customId == "playPause") {
         if (!client.queue.connection.paused) {
-            await interaction.update({ content: `Paused "${client.queue.nowPlaying().title}".` });
-            return await client.queue.setPaused(true);
+            await interaction.update({ content: `Paused "${client.queue.currentTrack.title}".` });
+            //return await client.queue.setPaused(true);
+            return await client.queue.node.pause();
         } else {
-            await interaction.update({ content: `Started playing "${client.queue.nowPlaying().title}".` });
-            return await client.queue.setPaused(false);
+            await interaction.update({ content: `Started playing "${client.queue.currentTrack.title}".` });
+            //return await client.queue.setPaused(false);
+            return await client.queue.node.resume();
         }
     } else if (interaction.customId == "stop") {
-        await interaction.update({ content: `Stopped playing "${client.queue.nowPlaying().title}".` });
-        return await client.queue.stop();
+        await interaction.update({ content: `Stopped playing "${client.queue.currentTrack.title}".` });
+        return await client.queue.delete();
     } else if (interaction.customId == "skip") {
-        await interaction.update({ content: `Skipped "${client.queue.nowPlaying().title}".` });
-        return await client.queue.skip();
+        await interaction.update({ content: `Skipped "${client.queue.currentTrack.title}".` });
+        return await client.queue.node.skip();
     }
 });
 // WHEN SONG STARTS TO PLAY
-client.player.on("trackStart", async function(queue, track) {
+//client.player.on("trackStart", async function(queue, track) {
+client.player.events.on("playerStart", async function(queue, track) {
     const controlButtons = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId("playPause").setEmoji("⏯").setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setCustomId("stop").setEmoji("⏹️").setStyle(ButtonStyle.Secondary),
@@ -143,17 +147,30 @@ client.player.on("trackStart", async function(queue, track) {
     client.player.musicAnnounceMessage = await queue.metadata.interaction.followUp({ content: `Started playing "${track.title}".`, components: [controlButtons] });
 });
 // WHEN SONG STOPS PLAYING (END, STOP OR SKIP)
-client.player.on("trackEnd", async function(queue, track) {
+//client.player.on("trackEnd", async function(queue, track) {
+client.player.events.on("playerFinish", async function(queue, track) {
     await client.player.musicAnnounceMessage.edit({ components: [] });
     setTimeout(async function(message){
         await message.delete();
     }, 15000, client.player.musicAnnounceMessage);
+    if (client.queue.isEmpty()) {
+        console.log(`> QUEUE ENDED`);
+        try{
+            await client.queue.delete();
+        } catch {
+            // already deleted
+        }
+    }
 });
+/*client.player.events.on("emptyQueue", async function(queue) {
+    console.log(`> QUEUE ENDED`)
+    await client.queue.delete();
+})*/
 // MUSIC ERRORS
-client.player.on("error", (queue, error) => {
+client.player.events.on("error", (queue, error) => {
     console.log(`> ERROR PLAYING MUSIC:\n${error}`);
 });
-client.player.on("connectionError", (queue, error) => {
+client.player.events.on("playerError", (queue, error) => {
     console.log(`> ERROR PLAYING MUSIC, connection error:\n${error}`);
 });
 // EVERY DAY AT MIDNIGHT (CLEAR GIF VIOLATIONS AND VOICE CHANNEL TEXT CHANNELS)
