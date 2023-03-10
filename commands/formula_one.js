@@ -302,7 +302,7 @@ module.exports = {
                     //const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Circuit Stats").setURL(interaction.options.getString("url")));
                     //await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }] });
                     if (!(interaction.options.getString("button1-label") && interaction.options.getString("button1-url"))) {
-                        await webhook.send({ files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }], threadId: interaction.channelId });
+                        await webhook.send({ files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }] });
                     } else if (!(interaction.options.getString("button2-label") && interaction.options.getString("button2-url"))) {
                         const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(interaction.options.getString("button1-label")).setURL(interaction.options.getString("button1-url")));
                         await webhook.send({ components: [buttons], files: [{ attachment: interaction.options.getAttachment("graphic").url, name: "graphic.png" }] });

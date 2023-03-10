@@ -20,18 +20,6 @@ module.exports = {
                 channel: interaction.channel
             },
             selfDeaf: true,
-            leaveOnEmpty: true,
-            leaveOnEmptyCooldown: 10,
-            leaveOnEnd: true,
-            leaveOnEndCooldown: 10,
-            leaveOnStop: true,
-            leaveOnStopCooldown: 10,
-            repeatMode: false
-            /*async onBeforeCreateStream(track, source, _queue) {
-                if (source === "youtube") {
-                    return (await playdl.stream(track.url, { discordPlayerCompatibility: true })).stream;
-                }
-            }*/
         });
         try {
             if (!client.queue.connection) await client.queue.connect(interaction.member.voice.channel); // error
@@ -44,9 +32,41 @@ module.exports = {
             requestedBy: interaction.user
         }).then(result => result.tracks[0]);
         if (!track) return await interaction.editReply({ content: `I could not find anything for "${query}".` });
-        // time filters here
+        // longer than 15:00 song
+        if (track.durationMS >= 899000) {
+            if (!(await client.queue.tracks.getSize()) && !(await client.queue.node.isPlaying())) await client.queue.delete();
+            interactionToDelete = await interaction.editReply({ content: `I can't play songs that are longer than 15 minutes. That song was ${track.duration} long.` });
+            setTimeout(async function(message){
+                try {
+                    await message.delete();
+                } catch {
+                    // ephemeral message already dismissed
+                }
+            }, 15000, interactionToDelete);
+            return interactionToDelete;
+        }
+        // longer than 15:00 queue (This only works because if the length goes above one hour, it would have been stopped above. Shit code! UPDATE I think this is no longer the case, check later!)
+        let queueLength = track.durationMS;
+        if (await client.queue.node.isPlaying()) {
+            queueLength += client.queue.currentTrack.durationMS;
+        }
+        if (client.queue.tracks[0]) {
+            for (tIndex in client.queue.tracks) {
+                queueLength += client.queue.tracks[tIndex].durationMS;
+            }
+        }
+        if (queueLength >= 870000) {
+            interactionToDelete = await interaction.editReply({ content: `I can't handle queues that are longer than 15 minutes. Try again in a moment.` });
+            setTimeout(async function(message){
+                try {
+                    await message.delete();
+                } catch {
+                    // ephemeral message already dismissed
+                }
+            }, 15000, interactionToDelete);
+            return interactionToDelete;
+        }
         await client.queue.addTrack(track);
-        //if (!client.queue.isPlaying()) await client.queue.node.play(track);
         if (!client.queue.isPlaying()) await client.queue.node.play();
         return await interaction.editReply({ content: `I'm loading your song "${track.title}".`});
     }
