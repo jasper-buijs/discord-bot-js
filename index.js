@@ -157,7 +157,7 @@ client.player.events.on("playerError", (queue, error) => {
     console.log(`> ERROR PLAYING MUSIC, connection error:\n${error}`);
 });
 // EVERY DAY AT MIDNIGHT (CLEAR GIF VIOLATIONS AND VOICE CHANNEL TEXT CHANNELS)
-schedule.scheduleJob("30 18 * * *", async () => {
+schedule.scheduleJob("0 0 * * *", async () => {
     client.gifSpamViolationTracker = [];
     await client.guilds.cache.get(guildId).channels.fetch();
     let voiceChannels = client.guilds.cache.get(guildId).channels.cache.filter(channel => channel.type == ChannelType.GuildVoice);
