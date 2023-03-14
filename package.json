@@ -1,15 +1,24 @@
 {
   "name": "wumpusbot",
-  "version": "2.2.1",
-  "description": "",
+  "version": "3.0.0",
+  "description": "Custom and priate Discord bot for Heilige Maagden server.",
+  "homepage": "https://github.com/jasper-buijs/discord-bot-js",
+  "bugs": {
+    "url": "https://github.com/jasper-buijs/discord-bot-js/issues"
+  },
   "main": "index.js",
   "scripts": {
     "main": "node index.js",
     "deploy": "node deploy-commands.js"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Jasper Buijs",
+  "contributors": [
+    {
+      "name": "Wout Wenseleers"
+    }
+  ],
+  "license": "UNLICENSED",
   "engines": {
     "node": ">=18.13.0"
   },
