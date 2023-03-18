@@ -29,12 +29,14 @@ module.exports = {
             return await interaction.followUp({ content: "Could not join your voice channel!", ephemeral: true });
         }
         const track = await client.player.search(query, {
-            requestedBy: interaction.user
+            requestedBy: interaction.user,
+            searchEngine: "youtube",
+            fallbackSearchEngine: "auto"
         }).then(result => result.tracks[0]);
         if (!track) return await interaction.editReply({ content: `I could not find anything for "${query}".` });
         // longer than 15:00 song
         if (track.durationMS >= 899000) {
-            if (!(await client.queue.tracks.getSize()) && !(await client.queue.node.isPlaying())) await client.queue.delete();
+            if (!(await client.queue.getSize()) && !(await client.queue.node.isPlaying())) await client.queue.delete();
             interactionToDelete = await interaction.editReply({ content: `I can't play songs that are longer than 15 minutes. That song was ${track.duration} long.` });
             setTimeout(async function(message){
                 try {
