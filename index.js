@@ -126,7 +126,10 @@ client.on("interactionCreate", async interaction => {
         }
     } else if (interaction.customId == "stop") {
         await interaction.update({ content: `Stopped playing "${client.queue.currentTrack.title}".` });
-        return await client.queue.delete();
+        //return await client.queue.delete();
+        //await client.queue.clear();
+        //return await client.queue.node.skip();
+        return await client.queue.node.stop();
     } else if (interaction.customId == "skip") {
         await interaction.update({ content: `Skipped "${client.queue.currentTrack.title}".` });
         return await client.queue.node.skip();
@@ -156,7 +159,7 @@ client.player.events.on("error", (queue, error) => {
 client.player.events.on("playerError", (queue, error) => {
     console.log(`> ERROR PLAYING MUSIC, connection error:\n${error}`);
 });
-// EVERY DAY AT MIDNIGHT (CLEAR GIF VIOLATIONS AND VOICE CHANNEL TEXT CHANNELS)
+// EVERY DAY AT MIDNIGHT (CLEAR GIF VIOLATIONS, COMMAND LINE AND VOICE CHANNEL TEXT CHANNELS)
 schedule.scheduleJob("0 0 * * *", async () => {
     client.gifSpamViolationTracker = [];
     await client.guilds.cache.get(guildId).channels.fetch();

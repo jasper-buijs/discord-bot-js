@@ -5,7 +5,7 @@ module.exports = {
     data: new SlashCommandBuilder().setName("play").setDescription("Play a song in a voice channel.").addStringOption(op => op.setName("song").setDescription("name or url of the song you want to play.").setRequired(true)),
     async execute(client, interaction) {
         if (!interaction.member.voice.channelId) {
-            console.log("> ERROR with MUSIC: user not in voice channel")
+            console.log("> ERROR with MUSIC: user not in voice channel");
             return await interaction.reply({ content: "You are not in a voice channel.", ephemeral: true });
         }
         if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId != interaction.guild.members.me.voice.channelId) {
@@ -20,6 +20,12 @@ module.exports = {
                 channel: interaction.channel
             },
             selfDeaf: true,
+            leaveOnEmpty: true,
+            leaveOnEmptyCooldown: 0,
+            leaveOnEnd: true,
+            leaveOnEndCooldown: 300000,
+            leaveOnStop: true,
+            leaveOnStopCooldown: 300000
         });
         try {
             if (!client.queue.connection) await client.queue.connect(interaction.member.voice.channel); // error
