@@ -135,6 +135,32 @@ client.on("interactionCreate", async interaction => {
         return await client.queue.node.skip();
     }
 });
+// BUTTON CLICKED (REACTION TO MESSAGE REPORTS)
+client.on("interactionCreate", async interaction => {
+    if (!interaction.isButton()) return;
+    if (interaction.customId == "messageReportPardon") {
+        const report = client.messageReports.filter(report => report.buttonMessageId == interaction.message.id)[0];
+        const member = await interaction.guild.members.fetch(report.userId);
+        await member.send(`You recently reported a message in our server. The message "${report.targetMessageContent}" was deemed not to break the Server Rules or Community Guidelines. Therefore, we did not take any action against the message. If you disagree with this decision, please contact a moderator and explain why you think this is the wrong decision.`);
+        const channels = await interaction.guild.channels.fetch();
+        const channel = channels.find(channel => channel.name == "blocked-messages");
+        const message = await channel.messages.fetch(report.buttonMessageId);
+        await message.edit({ components: [] });
+    } else if (interaction.customId == "messageReportWarning") {
+        const report = client.messageReports.filter(report => report.buttonMessageId == interaction.message.id)[0];
+        const authorId = report.target.author.id;
+        if (report.target.id) report.target.delete();
+        const member = await interaction.guild.members.fetch(report.userId);
+        await member.send(`You recently reported a message in our server. The message "${report.targetMessageContent}" was deemed to be an infringement of the Server Rules or Community Guidelines and has been deleted. Additional actions against the user may have been taken, depending on the severity of the infringement. Thank you for reporting!`);
+        const author = await interaction.guild.members.fetch(authorId);
+        await author.send(`A message you send in our server has been deleted. The message "${report.targetMessageContent}" was deemed to be an infringement of the Server Rules or Community Guidelines. Remember additional actions may be taken against you if you continue breaking these rules.`);
+        await author.send(report.replyMessage);
+        const channels = await interaction.guild.channels.fetch();
+        const channel = channels.find(channel => channel.name == "blocked-messages");
+        const message = await channel.messages.fetch(report.buttonMessageId);
+        await message.edit({ components: [] });
+    }
+});
 // WHEN SONG STARTS TO PLAY
 client.player.events.on("playerStart", async function(queue, track) {
     const controlButtons = new ActionRowBuilder().addComponents(
