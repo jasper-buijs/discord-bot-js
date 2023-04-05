@@ -9,6 +9,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 client.player = new Player(client);
 client.messageReports = new Array();
 client.userReports = new Array();
+client.userVoiceReports = new Array();
 client.temporaryVoiceChannels = new Array();
 client.gifSpamViolationTracker = new Array();
 client.formula1LiveData = {

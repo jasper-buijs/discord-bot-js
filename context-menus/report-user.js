@@ -1,6 +1,6 @@
 const { ContextMenuCommandBuilder, ApplicationCommandType, ActionRowBuilder, SelectMenuBuilder, ComponentType, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 module.exports = {
-    data: new ContextMenuCommandBuilder().setName("Report User").setType(ApplicationCommandType.User),
+    data: new ContextMenuCommandBuilder().setName("Report User Profile").setType(ApplicationCommandType.User),
     async execute(client, interaction) {
         await interaction.deferReply({ ephemeral: true });
         await client.userReports.push(new Object({
@@ -9,40 +9,54 @@ module.exports = {
             targetMember: interaction.targetMember,
             userId: interaction.user.id,
             reason: "unknown",
+            replyMessage: "empty",
+            buttonMessageId: "empty",
             actionTaken: false
         }));
         const reasonSelector = new ActionRowBuilder().addComponents(
-            new SelectMenuBuilder().setCustomId("reportUserReason").setPlaceholder("Select a reason").addOptions(
-                {
-                    label: "Offensive profile picture",
-                    description: "Using a profile picture that may be seen as offensive or gory.",
-                    value: "offensive-profile-picture"
-                },
-                {
-                    label: "Offensive status, about-me or name",
-                    description: "Using a (custom or RPC) status, about-me or username that may be seen as offensive.",
-                    value: "offensive-profile-text"
-                },
-                {
-                    label: "Self-botting",
-                    description: "Using self-bots or user-bots as per Discord's Community Guidelines.",
-                    value: "self-botting"
-                },
-                {
-                    label: "Spamming in voice",
-                    description: "Spamming voice channels in any way, or using unnatural sounding voice-changers.",
-                    value: "spamming-voice"
-                },
-                {
-                    label: "Harassment in voice",
-                    description: "Harassing, insulting, discriminating or otherwise hurting someone in a voice channel.",
-                    value: "harassing-voice"
-                },
-                {
-                    label: "Streaming inappropriate content",
-                    description: "Live-streaming gore, acts of violence, age restricted content, or otherwise inappropriate content.",
-                    value: "streaming-gore"
-                }
+            new SelectMenuBuilder().setCustomId("reportUserReason").setPlaceholder("Select a reason").setMinValues(1).setMaxValues(1).addOptions(
+                [
+                    {
+                        label: "Hateful conduct on profile",
+                        description: "Engaging in other hateful conduct.",
+                        value: "hate"
+                    },
+                    {
+                        label: "Violent extremism on profile",
+                        description: "Supporting violent extremism.",
+                        value: "violent-extremism"
+                    },
+                    {
+                        label: "Age-restricted content on profile",
+                        description: "Making sexually explicit content available to children.",
+                        value: "age-restricted"
+                    },
+                    {
+                        label: "Misreprestative identity",
+                        description: "Misrepresenting your identity in a deceptive manner.",
+                        value: "misrepresentative-id"
+                    },
+                    {
+                        label: "Financial scams",
+                        description: "Do not use Discord to execute financial scams.",
+                        value: "scam"
+                    },
+                    {
+                        label: "Illegal behavior",
+                        description: "Organizing, promoting or engaging in illegal behavior.",
+                        value: "illegal-behavior"
+                    },
+                    {
+                        label: "Self-bots and user-bots",
+                        description: "Usong self-bots or user-bots",
+                        value: "self-bot"
+                    },
+                    {
+                        label: "Other",
+                        description: "Other offences of the TOS or CG.",
+                        value: "other"
+                    }
+                ]
             )
         );
         const replyMessages = new Object({
