@@ -4,6 +4,8 @@ const { Client, GatewayIntentBits, Collection, InteractionType, ChannelType, Act
 const fs = require("fs");
 const { Player } = require("discord-player");
 const { token, clientId, guildId } = require("./config.json");
+// FORCE PLAY-DL DUE TO BUG WITH YTDL-CORE
+process.env.DP_FORCE_YTDL_MOD="play-dl";
 // DECLARATIONS
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.MessageContent] });
 client.player = new Player(client);
