@@ -25,7 +25,8 @@ module.exports = {
             leaveOnEnd: true,
             leaveOnEndCooldown: 300000,
             leaveOnStop: true,
-            leaveOnStopCooldown: 300000
+            leaveOnStopCooldown: 300000,
+            volume: 45
         });
         try {
             if (!client.queue.connection) await client.queue.connect(interaction.member.voice.channel); // error
