@@ -4,15 +4,15 @@ const { joinVoiceChannel } = require("@discordjs/voice");
 module.exports = {
     data: new SlashCommandBuilder().setName("play").setDescription("Play a song in a voice channel.").addStringOption(op => op.setName("song").setDescription("name or url of the song you want to play.").setRequired(true)),
     async execute(client, interaction) {
+        await interaction.deferReply({ ephemeral: true });
         if (!interaction.member.voice.channelId) {
             console.log("> ERROR with MUSIC: user not in voice channel");
-            return await interaction.reply({ content: "You are not in a voice channel.", ephemeral: true });
+            return await interaction.editReply({ content: "You are not in a voice channel.", ephemeral: true });
         }
         if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId != interaction.guild.members.me.voice.channelId) {
             console.log("> ERROR with MUSIC: user in diffrent voice channel.");
-            return await interaction.reply({ content: "You are not in my voice channel!", ephemeral: true });
+            return await interaction.editReply({ content: "You are not in my voice channel!", ephemeral: true });
         }
-        await interaction.deferReply({ ephemeral: true });
         const query = interaction.options.getString("song");
         client.queue = client.player.nodes.create(interaction.guild, {
             metadata: {
