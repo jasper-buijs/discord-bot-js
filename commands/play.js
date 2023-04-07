@@ -14,7 +14,8 @@ module.exports = {
             return await interaction.editReply({ content: "You are not in my voice channel!", ephemeral: true });
         }
         const query = interaction.options.getString("song");
-        client.queue = client.player.nodes.create(interaction.guild, {
+        client.interactionOfPlayingSong = interaction;
+        client.queue = await client.player.nodes.create(interaction.guild, {
             metadata: {
                 interaction: interaction,
                 channel: interaction.channel
