@@ -145,17 +145,8 @@ client.player.events.on("playerStart", async function(queue, track) {
         new ButtonBuilder().setCustomId("skip").setEmoji("⏭️").setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setLabel("Open in Browser").setURL(track.url).setStyle(ButtonStyle.Link)
     );
-    console.log(`reply to ${client.interactionOfPlayingSong.createdAt}.`)
+    console.log(`> MUSIC playing "${track.title}" (${track.url}) by ${track.author}`);
     client.player.musicAnnounceMessage = await client.interactionOfPlayingSong.followUp({ content: `Started playing "${track.title}".`, components: [controlButtons] });
-    /*if (queue.metadata.interaction.token) {
-        console.log(`reply to ${queue.metadata.interaction.createdAt}, AKA ${queue.metadata.interaction.createdTimestamp}`);
-        client.player.musicAnnounceMessage = await client.queue.metadata.interaction.followUp({ content: `Started playing "${track.title}".`, components: [controlButtons] });
-    } else {
-        console.log("fallback");
-        client.player.musicAnnounceMessage = await client.queue.metadata.channel.send({ content: `Started playing "${track.title}".`, components: [controlButtons]});
-    }*/
-    // epehemeral message already dismissed? unlikely
-    // referencing previous message sometimes?
 });
 // WHEN SONG STOPS PLAYING (END, STOP OR SKIP)
 client.player.events.on("playerFinish", async function(queue, track) {
