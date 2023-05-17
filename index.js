@@ -1,6 +1,6 @@
 // IMPORT PACKAGES
 const schedule = require("node-schedule");
-const { Client, GatewayIntentBits, Collection, InteractionType, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, Events, EmbedBuilder } = require("discord.js");
+const { Client, GatewayIntentBits, Collection, InteractionType, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, Events, EmbedBuilder, ActivityType, MessageFlags } = require("discord.js");
 const fs = require("fs");
 const { Player } = require("discord-player");
 const { token, clientId, guildId } = require("./config.json");
@@ -9,6 +9,7 @@ process.env.DP_FORCE_YTDL_MOD="play-dl";
 // DECLARATIONS
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.MessageContent] });
 client.player = new Player(client);
+client.player.extractors.loadDefault();
 client.messageReports = new Array();
 client.userReports = new Array();
 client.temporaryVoiceChannels = new Array();
@@ -139,21 +140,24 @@ client.on("interactionCreate", async interaction => {
 });
 // WHEN SONG STARTS TO PLAY
 client.player.events.on("playerStart", async function(queue, track) {
+    client.queue = queue;
     const controlButtons = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId("playPause").setEmoji("⏯").setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setCustomId("stop").setEmoji("⏹️").setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setCustomId("skip").setEmoji("⏭️").setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setLabel("Open in Browser").setURL(track.url).setStyle(ButtonStyle.Link)
     );
-    console.log(`> MUSIC playing "${track.title}" (${track.url}) by ${track.author}`);
-    client.player.musicAnnounceMessage = await client.interactionOfPlayingSong.followUp({ content: `Started playing "${track.title}".`, components: [controlButtons] });
+    console.log(`> MUSIC playing "${track.title}" (${track.url}) by ${queue.metadata.requestMember.displayName}`);
+    client.user.setPresence({ activities: [{ name: track.title, type: ActivityType.Playing }], status: "online" });
+    client.player.musicControlsMessage = await queue.metadata.textChannel.send({ content: `Started playing "${track.title}", as requested by <@${queue.metadata.requestMember.id}>.`, components: [controlButtons], flags: [MessageFlags.SuppressNotifications] });
 });
 // WHEN SONG STOPS PLAYING (END, STOP OR SKIP)
 client.player.events.on("playerFinish", async function(queue, track) {
-    await client.player.musicAnnounceMessage.edit({ components: [] });
+    await client.player.musicControlsMessage.edit({ components: [] });
     setTimeout(async function(message){
         await message.delete();
-    }, 15000, client.player.musicAnnounceMessage);
+    }, 15000, client.player.musicControlsMessage);
+    client.user.setPresence({ activities: [], status: "online" });
 });
 // MUSIC ERRORS
 client.player.events.on("error", (queue, error) => {
