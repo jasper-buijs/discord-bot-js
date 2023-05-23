@@ -149,7 +149,7 @@ client.player.events.on("playerStart", async function(queue, track) {
     );
     console.log(`> MUSIC playing "${track.title}" (${track.url}) by ${queue.metadata.requestMember.displayName}`);
     client.user.setPresence({ activities: [{ name: track.title, type: ActivityType.Playing }], status: "online" });
-    client.player.musicControlsMessage = await queue.metadata.textChannel.send({ content: `Started playing "${track.title}", as requested by <@${queue.metadata.requestMember.id}>.`, components: [controlButtons], flags: [MessageFlags.SuppressNotifications] });
+    client.player.musicControlsMessage = await queue.metadata.textChannel.send({ content: `Started playing "${track.title}", as requested by <@${track.requestedBy.id}>.`, components: [controlButtons], flags: [MessageFlags.SuppressNotifications] });
 });
 // WHEN SONG STOPS PLAYING (END, STOP OR SKIP)
 client.player.events.on("playerFinish", async function(queue, track) {
