@@ -12,14 +12,27 @@ module.exports = {
         )),
     async execute(client, interaction) {
         await interaction.deferReply({ ephemeral: true });
-        if (interaction.options.getString("platform") == QueryType.AUTO && !/^https?:\/\/(.+\/)+.+(\.(aac|aiff|flac|m4a|mp3|wav|wma))$/.test(interaction.options.getString("song"))) {
+        let query = interaction.options.getString("song");
+        let engine = interaction.options.getString("platform") ?? QueryType.YOUTUBE;
+        if (/^https?:\/\/(.+\/)+.+$/.test(query)) {
             console.log("yes");
+            engine = QueryType.AUTO;
+        }
+        if (interaction.options.getString("platform") == QueryType.AUTO && !/^https?:\/\/(.+\/)+.+(\.(aac|aiff|flac|m4a|mp3|wav|wma))$/.test(query)) {
+            return await interaction.editReply({ content: "Either you didn't pass a url to an audio file or song.", ephemeral: true });
         }
         const memberChannel = interaction.member.voice.channel;
         if (!memberChannel) return await interaction.editReply({ content: "You must be in a voice channel if you want to play music.", ephemeral: true });
         if (interaction.guild.members.me.voice.channelId && interaction.guild.members.me.voice.channelId != memberChannel.id) return await interaction.editReply({ content: "I'm already playing music in a diffrent voice channel. Please try again later.", ephemeral: true });
-        const query = interaction.options.getString("song");
-        const { track } = await client.player.play(interaction.member.voice.channel, query, {
+        //const query = interaction.options.getString("song");
+        const result = await client.player.search(query, {
+            requestedBy: interaction.user,
+            searchEngine: engine
+        }).then(results => results.tracks[0]);
+        //console.log(result.durationMS);
+        if (!result) return await interaction.editReply({ content: `I couldn't find any songs for ${interaction.options.getString("song")} on that platform.`, ephemeral: true });
+        else if (result.durationMS > 1800000) return await interaction.editReply({ content: "Unfortunately, I'm not allowed to play songs longer than 30 minutes.", ephemeral: true });
+        const { track } = await client.player.play(interaction.member.voice.channel, result, {
             nodeOptions: {
                 leaveOnEmpty: true,
                 leaveOnEmptyCooldown: 0,
@@ -34,9 +47,9 @@ module.exports = {
                 },
                 selfDeaf: true,
                 volume: 45
-            },
-            requestedBy: interaction.user,
-            searchEngine: interaction.options.getString("platform") ?? QueryType.YOUTUBE
+            }//,
+            //requestedBy: interaction.user,
+            //searchEngine: interaction.options.getString("platform") ?? QueryType.YOUTUBE
         });
         await interaction.editReply({ content: `I'm loading and queuing your song "${track.title}".`, ephemeral: true });
     }
