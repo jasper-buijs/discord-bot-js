@@ -3,7 +3,8 @@ const schedule = require("node-schedule");
 const { Client, GatewayIntentBits, Collection, InteractionType, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, Events, EmbedBuilder, ActivityType, MessageFlags } = require("discord.js");
 const fs = require("fs");
 const { Player } = require("discord-player");
-const { token, clientId, guildId } = require("./config.json");
+const { token, clientId, guildId, riotAPIToken } = require("./config.json");
+const { monitorEventLoopDelay } = require("perf_hooks");
 // FORCE PLAY-DL DUE TO BUG WITH YTDL-CORE
 process.env.DP_FORCE_YTDL_MOD="play-dl";
 // DECLARATIONS
@@ -188,5 +189,55 @@ schedule.scheduleJob("0 0 * * *", async () => {
             await commandLineChannel.bulkDelete(messagesInCommandLineChannel);
         }
     });
+});
+// EVERY 15 MINUTES (RIOT API)
+schedule.scheduleJob(Date.now(), async () => {
+    const requestOptions = new Object({
+        method: "GET",
+        headers: {
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept-Charset": "application/x-www-form-urlencoded; charset=UTF-8",
+            "X-Riot-Token": riotAPIToken
+        }
+    });
+    // LOL EUW (euw1.api.riotgames.com/lol/status/v4)
+    const lol_euwRespons = await fetch("https://euw1.api.riotgames.com/lol/status/v4/platform-data", requestOptions);
+    console.log("> LOL EUW", lol_euwRespons.status, lol_euwRespons.statusText);
+    if (lol_euwRespons.status != 200) return console.error(`> LOL EUW request failed with code ${lol_euwRespons.status, lol_euwRespons.statusText} and these headers:\n${lol_euwRespons.headers}`);
+    const lol_euwData = await lol_euwRespons.json();
+    // LOL PBE (pbe1.api.riotgames.com/lol/status/v4)
+    const lol_pbeRespons = await fetch("https://pbe1.api.riotgames.com/lol/status/v4/platform-data", requestOptions);
+    console.log("> LOL PBE", lol_pbeRespons.status, lol_pbeRespons.statusText);
+    if (lol_pbeRespons.status != 200) return console.error(`> LOL PBE request failed with code ${lol_pbeRespons.status, lol_pbeRespons.statusText} and these headers:\n${lol_pbeRespons.headers}`);
+    const lol_pbeData = await lol_pbeRespons.json();
+    // TFT EUW (euw1.api.riotgames.com/tft/status/v1)
+    const tft_euwRespons = await fetch("https://euw1.api.riotgames.com/tft/status/v1/platform-data", requestOptions);
+    console.log("> TFT EUW", tft_euwRespons.status, tft_euwRespons.statusText);
+    if (tft_euwRespons.status != 200) return console.error(`> TFT EUW request failed with code ${tft_euwRespons.status, tft_euwRespons.statusText} and these headers:\n${tft_euwRespons.headers}`);
+    const tft_euwData = await tft_euwRespons.json();
+    // TFT PBE (pbe1.api.riotgames.com/tft/status/v1)
+    const tft_pbeRespons = await fetch("https://pbe1.api.riotgames.com/tft/status/v1/platform-data", requestOptions);
+    console.log("> TFT PBE", tft_pbeRespons.status, tft_pbeRespons.statusText);
+    if (tft_pbeRespons.status != 200) return console.error(`> TFT PBE request failed with code ${tft_pbeRespons.status, tft_pbeRespons.statusText} and these headers:\n${tft_pbeRespons.headers}`);
+    const tft_pbeData = await tft_pbeRespons.json();
+
+    // PARSE LOL EUW INCIDENTS
+    var lol_euwMaintenances = new Array();
+    var lol_euwIncidents = new Array();
+    console.log(lol_euwData.maintenances[0]);
+    lol_euwData.maintenances.forEach(async maintenance => {
+        if (!lol_euwMaintenances.find(m => m.id == maintenance.id)) {
+            if (maintenance.maintenance_status == "scheduled") {
+                const embed = new EmbedBuilder()
+                    .setAuthor({ name: `${maintenance.author}`, url: "https://status.riotgames.com/lol?region=euw1&locale=en_US"})
+                    .setColor("0x800080")
+                    .setFooter(`Platforms affected: ${maintenance.platforms.join(", ")} | ID: ${maintenance.id}`)
+                    .setTimestamp()
+                    .setTitle(`:tools: ${maintenance.titles}`)
+            }
+        }
+    })
+
+
 });
 client.login(token);
