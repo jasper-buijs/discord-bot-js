@@ -15,7 +15,6 @@ module.exports = {
         let query = interaction.options.getString("song");
         let engine = interaction.options.getString("platform") ?? QueryType.YOUTUBE;
         if (/^https?:\/\/(.+\/)+.+$/.test(query)) {
-            console.log("yes");
             engine = QueryType.AUTO;
         }
         if (interaction.options.getString("platform") == QueryType.AUTO && !/^https?:\/\/(.+\/)+.+(\.(aac|aiff|flac|m4a|mp3|wav|wma))$/.test(query)) {
