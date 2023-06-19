@@ -2,6 +2,7 @@
 const schedule = require("node-schedule");
 const { Client, GatewayIntentBits, Collection, InteractionType, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, Events, EmbedBuilder, ActivityType, MessageFlags } = require("discord.js");
 const fs = require("fs");
+const parse = require("csv-parse");
 const { Player } = require("discord-player");
 const { token, clientId, guildId } = require("./config.json");
 // FORCE PLAY-DL DUE TO BUG WITH YTDL-CORE
@@ -188,6 +189,54 @@ schedule.scheduleJob("0 0 * * *", async () => {
             messagesInCommandLineChannel = await commandLineChannel.messages.fetch(true);
             await commandLineChannel.bulkDelete(messagesInCommandLineChannel);
         }
+    });
+});
+// EVERY DAY AT THREE AM (CHECK RALLLY UPDATES)
+client.on("ready", async () => {
+    await client.guilds.cache.get(guildId).roles.fetch();
+    const userIDs = new Object({
+        "Alp": "490480466466570240",
+        "Emily": "333598839959453706",
+        "Ferre": "467773625852887060",
+        "Maarten": "283642353158193152",
+        "Jasper": "575696318228463637",
+        "Wout": "363375727669673984",
+        "Aaron": "520573632515276804",
+        "Thor": "533319049476833310",
+        "Thomas": "268083266949611520",
+        "Lucas": "585886134467559427",
+        "Luca": "224207870441291776",
+        "Mane": "254307858148098048",
+        "Dario": "902212154441211934",
+        "Brammert": "338577600253394945",
+        "Ruben": "423566704703176724",
+        "Yoran": "288359564351635457"
+    });
+    const roles = new Object({
+        "Yes": client.guilds.cache.get(guildId).roles.cache.find(r => r.name == "Rallly - Available"),
+        "If need be": client.guilds.cache.get(guildId).roles.cache.find(r => r.name == "Rallly - If need be"),
+        "No": client.guilds.cache.get(guildId).roles.cache.find(r => r.name == "Rallly - Unavailable")
+    });
+    fs.readFile(`./rallly-data/${String(guildId)}.csv`, async function (err, csvData) {
+        const whenRalllyJobTime = `0,${String(Number(new Date().toString().split(" ")[4].split(":")[1]) + 1)} 3,${String(new Date().toString().split(" ")[4].split(":")[0])} * * *`;
+        schedule.scheduleJob(whenRalllyJobTime, async () => {
+            parse.parse(csvData, {delimiter: ","}, async function (err, array) {
+                for (i = 1; i < array[0].length; i++) {
+                    var day = array[0][i].split(" ")[1];
+                    var month = array[0][i].split(" ")[2];
+                    var today = new Date().toDateString().split(" ")[2].startsWith("0") ? new Date().toDateString().split(" ")[2].replace("0", "") : new Date().toDateString().split(" ")[2];
+                    var thisMonth = new Date().toDateString().split(" ")[1];
+                    if (day == today && month == thisMonth) {
+                        for (j = 1; j < array.length; j++) {
+                            const member = await client.guilds.cache.get(guildId).members.fetch(userIDs[array[j][0]]);
+                            await member.roles.remove([roles["Yes"], roles["If need be"], roles["No"]]);
+                            await member.roles.add(roles[array[j][i]]);
+                            console.log(`> Assigned ${array[j][0]} role ${array[j][i]} on ${new Date().toDateString()}`);
+                        }
+                    }
+                }
+            });
+        });
     });
 });
 client.login(token);
