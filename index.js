@@ -191,7 +191,7 @@ schedule.scheduleJob("0 0 * * *", async () => {
     });
 });
 // EVERY 15 MINUTES (RIOT API)
-schedule.scheduleJob(Date.now(), async () => {
+schedule.scheduleJob(Date.now()+500, async () => {
     const requestOptions = new Object({
         method: "GET",
         headers: {
@@ -201,17 +201,17 @@ schedule.scheduleJob(Date.now(), async () => {
         }
     });
     // LOL EUW (euw1.api.riotgames.com/lol/status/v4)
-    const lol_euwRespons = await fetch("https://euw1.api.riotgames.com/lol/status/v4/platform-data", requestOptions);
-    console.log("> LOL EUW", lol_euwRespons.status, lol_euwRespons.statusText);
-    if (lol_euwRespons.status != 200) return console.error(`> LOL EUW request failed with code ${lol_euwRespons.status, lol_euwRespons.statusText} and these headers:\n${lol_euwRespons.headers}`);
-    const lol_euwData = await lol_euwRespons.json();
+    const euwRespons = await fetch("https://euw1.api.riotgames.com/lol/status/v4/platform-data", requestOptions);
+    console.log("> LOL EUW", euwRespons.status, euwRespons.statusText);
+    if (euwRespons.status != 200) return console.error(`> LOL EUW request failed with code ${euwRespons.status, euwRespons.statusText} and these headers:\n${euwRespons.headers}`);
+    const euwData = await euwRespons.json();
     // LOL PBE (pbe1.api.riotgames.com/lol/status/v4)
-    const lol_pbeRespons = await fetch("https://pbe1.api.riotgames.com/lol/status/v4/platform-data", requestOptions);
-    console.log("> LOL PBE", lol_pbeRespons.status, lol_pbeRespons.statusText);
-    if (lol_pbeRespons.status != 200) return console.error(`> LOL PBE request failed with code ${lol_pbeRespons.status, lol_pbeRespons.statusText} and these headers:\n${lol_pbeRespons.headers}`);
-    const lol_pbeData = await lol_pbeRespons.json();
+    const pbeRespons = await fetch("https://pbe1.api.riotgames.com/lol/status/v4/platform-data", requestOptions);
+    console.log("> LOL PBE", pbeRespons.status, pbeRespons.statusText);
+    if (pbeRespons.status != 200) return console.error(`> LOL PBE request failed with code ${pbeRespons.status, pbeRespons.statusText} and these headers:\n${pbeRespons.headers}`);
+    const pbeData = await pbeRespons.json();
     // TFT EUW (euw1.api.riotgames.com/tft/status/v1)
-    const tft_euwRespons = await fetch("https://euw1.api.riotgames.com/tft/status/v1/platform-data", requestOptions);
+    /*const tft_euwRespons = await fetch("https://euw1.api.riotgames.com/tft/status/v1/platform-data", requestOptions);
     console.log("> TFT EUW", tft_euwRespons.status, tft_euwRespons.statusText);
     if (tft_euwRespons.status != 200) return console.error(`> TFT EUW request failed with code ${tft_euwRespons.status, tft_euwRespons.statusText} and these headers:\n${tft_euwRespons.headers}`);
     const tft_euwData = await tft_euwRespons.json();
@@ -219,25 +219,80 @@ schedule.scheduleJob(Date.now(), async () => {
     const tft_pbeRespons = await fetch("https://pbe1.api.riotgames.com/tft/status/v1/platform-data", requestOptions);
     console.log("> TFT PBE", tft_pbeRespons.status, tft_pbeRespons.statusText);
     if (tft_pbeRespons.status != 200) return console.error(`> TFT PBE request failed with code ${tft_pbeRespons.status, tft_pbeRespons.statusText} and these headers:\n${tft_pbeRespons.headers}`);
-    const tft_pbeData = await tft_pbeRespons.json();
+    const tft_pbeData = await tft_pbeRespons.json();*/
 
     // PARSE LOL EUW INCIDENTS
-    var lol_euwMaintenances = new Array();
-    var lol_euwIncidents = new Array();
-    console.log(lol_euwData.maintenances[0]);
-    lol_euwData.maintenances.forEach(async maintenance => {
-        if (!lol_euwMaintenances.find(m => m.id == maintenance.id)) {
-            if (maintenance.maintenance_status == "scheduled") {
-                const embed = new EmbedBuilder()
-                    .setAuthor({ name: `${maintenance.author}`, url: "https://status.riotgames.com/lol?region=euw1&locale=en_US"})
-                    .setColor("0x800080")
-                    .setFooter(`Platforms affected: ${maintenance.platforms.join(", ")} | ID: ${maintenance.id}`)
-                    .setTimestamp()
-                    .setTitle(`:tools: ${maintenance.titles}`)
+    var euwMaintenances = new Array();
+    var euwIncidents = new Array();
+
+    // gather messages
+    await client.guilds.cache.get(guildId).channels.fetch();
+    var statusChannel = client.guilds.cache.get(guildId).channels.cache.find(c => c.name == "service-status");
+    let sendMessages = await statusChannel.messages.fetch();
+    sendMessages.forEach(async message => {
+        if (message.author.id == client.user.id) {
+            let id = await message.embeds[0].footer.text.substring(3, 8);
+            let color = await message.embeds[0].hexColor;
+            await euwData.maintenances.forEach(async m => {
+                console.log(m.id, id);
+                console.log(color, "#800080");
+                if (m.id == id && color == "#800080") {
+                    euwMaintenances.push(m);
+                    // edit discord message
+                }
+            });
+            await euwData.incidents.forEach(async i => {
+                console.log(i.id == id);
+                console.log(["#e60000", "#ffa500"].includes(color));
+                if (i.id == id && ["#e60000", "#ffa500"].includes(color)) {
+                    euwIncidents.push(i);
+                    console.log("PUSHED", i, euwIncidents);
+                    // edit discord message
+                }
+            });
+        }
+    });
+    console.log(euwIncidents, euwMaintenances);
+
+    // send new messages
+    console.log(euwData.incidents[0]);
+    euwData.maintenances.forEach(async maintenance => {
+        if (!euwMaintenances.find(m => m.id == maintenance.id)) {
+            //if (maintenance.maintenance_status == "scheduled" && Number(new Date(maintenance.archive_at) - new Date()) < 0) {
+            if (maintenance.maintenance_status == "scheduled" && maintenance.archive_at == null) {
+                let embed = new EmbedBuilder()
+                    .setAuthor({ name: `Riot Games Service Status`, url: "https://status.riotgames.com/lol?region=euw1&locale=en_US"})
+                    .setColor("#800080")
+                    .setFooter({ text: `ID: ${maintenance.id} • Platforms affected: ${maintenance.platforms.join(", ")}` })
+                    .setTimestamp(Date.parse(maintenance.created_at))
+                    .setTitle(`:tools: ${maintenance.titles[0].content}`)
+                maintenance.updates.forEach(update => {
+                    //embed.addFields({ name: `Update ${new Date(update.created_at).toLocaleString("en-GB", { timeZone: "Europe/Brussels" }) }`, value: update.translations[0].content });
+                    if (Date.parse(update.created_at) - Date.parse(maintenance.created_at) < 5000 && Date.parse(update.created_at) - Date.parse(maintenance.created_at) > -5000) embed.setDescription(update.translations[0].content);
+                    else embed.addFields({ name: `Update ${new Date(update.created_at).toLocaleString("en-GB", { timeZone: "Europe/Brussels" }) }`, value: update.translations[0].content });
+                });
+                await statusChannel.send({ content: "", embeds: [embed] });
             }
         }
-    })
-
-
+    });
+    euwData.incidents.forEach(async incident => {
+        if (!euwIncidents.find(i => i.id == incident.id)) {
+            //if (Number(new Date(incident.archive_at) - new Date()) < 0) {
+            if (incident.archive_at == null) {
+                let embed = new EmbedBuilder()
+                    .setAuthor({ name: `Riot Games Service Status`, url: "https://status.riotgames.com/lol?region=euw1&locale=en_US"})
+                    .setColor(incident.incident_severity == "warning" ? "#ffa500" : "#e60000")
+                    .setFooter({ text: `ID: ${incident.id} • Platforms affected: ${incident.platforms.join(", ")}`})
+                    .setTimestamp(Date.parse(incident.created_at))
+                    .setTitle(`${incident.incident_severity == "warning" ? ":warning:" : ":no_entry_sign:"} ${incident.titles[0].content}`)
+                incident.updates.forEach(update => {
+                    //embed.addFields({ name: `Update ${new Date(update.created_at).toLocaleString("en-GB", { timeZone: "Europe/Brussels" }) }`, value: update.translations[0].content });
+                    if (Date.parse(update.created_at) - Date.parse(incident.created_at) < 5000 && Date.parse(update.created_at) - Date.parse(incident.created_at) > -5000) embed.setDescription(update.translations[0].content);
+                    else embed.addFields({ name: `Update ${new Date(update.created_at).toLocaleString("en-GB", { timeZone: "Europe/Brussels" }) }`, value: update.translations[0].content });
+                });
+                await statusChannel.send({ content: "", embeds: [embed] });
+            }
+        }
+    });
 });
 client.login(token);
