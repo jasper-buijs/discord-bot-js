@@ -154,8 +154,10 @@ client.player.events.on("playerStart", async function(queue, track) {
 });
 // WHEN SONG STOPS PLAYING (END, STOP OR SKIP)
 client.player.events.on("playerFinish", async function(queue, track) {
-    if (!client.player.musicControlsMessage.fetch()) return console.log("> DEBUG - MUSIC crash caught on index.js:156");
-    await client.player.musicControlsMessage.edit({ components: [] });
+    // if (!client.player.musicControlsMessage.fetch()) return console.log("> DEBUG - MUSIC crash caught on index.js:156");
+    await client.player.musicControlsMessage.edit({ components: [] }).catch(err => {
+        return console.log("> UNKNOWN ERROR with MUSIC: " + err);
+    });
     setTimeout(async function(message){
         await message.delete();
     }, 15000, client.player.musicControlsMessage);
