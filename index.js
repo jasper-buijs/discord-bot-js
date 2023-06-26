@@ -220,23 +220,27 @@ client.on("ready", async () => {
         "No": client.guilds.cache.get(guildId).roles.cache.find(r => r.name == "Rallly - Unavailable")
     });
     fs.readFile(`./rallly-data/${String(guildId)}.csv`, async function (err, csvData) {
-        const whenRalllyJobTime = `0,${String(Number(new Date().toString().split(" ")[4].split(":")[1]) + 1)} 3,${String(new Date().toString().split(" ")[4].split(":")[0])} * * *`;
-        schedule.scheduleJob(whenRalllyJobTime, async () => {
-            parse.parse(csvData, {delimiter: ","}, async function (err, array) {
-                for (i = 1; i < array[0].length; i++) {
-                    var day = array[0][i].split(" ")[1];
-                    var month = array[0][i].split(" ")[2];
-                    var today = new Date().toDateString().split(" ")[2].startsWith("0") ? new Date().toDateString().split(" ")[2].replace("0", "") : new Date().toDateString().split(" ")[2];
-                    var thisMonth = new Date().toDateString().split(" ")[1];
-                    if (day == today && month == thisMonth) {
-                        for (j = 1; j < array.length; j++) {
-                            const member = await client.guilds.cache.get(guildId).members.fetch(userIDs[array[j][0]]);
-                            await member.roles.remove([roles["Yes"], roles["If need be"], roles["No"]]);
-                            await member.roles.add(roles[array[j][i]]);
-                            console.log(`> Assigned ${array[j][0]} role ${array[j][i]} on ${new Date().toDateString()}`);
+        // const whenRalllyJobTime = `0,${String(Number(new Date().toString().split(" ")[4].split(":")[1]) + 1)} 3,${String(new Date().toString().split(" ")[4].split(":")[0])} * * *`;
+        const whenRalllyJobTime = [`10 0 * * *`, new Date(Date.now() + 30000)];
+        whenRalllyJobTime.forEach(time => {
+            schedule.scheduleJob(time, async () => {
+                console.log("> ", new Date().toTimeString());
+                parse.parse(csvData, {delimiter: ","}, async function (err, array) {
+                    for (i = 1; i < array[0].length; i++) {
+                        var day = array[0][i].split(" ")[1];
+                        var month = array[0][i].split(" ")[2];
+                        var today = new Date().toDateString().split(" ")[2].startsWith("0") ? new Date().toDateString().split(" ")[2].replace("0", "") : new Date().toDateString().split(" ")[2];
+                        var thisMonth = new Date().toDateString().split(" ")[1];
+                        if (day == today && month == thisMonth) {
+                            for (j = 1; j < array.length; j++) {
+                                const member = await client.guilds.cache.get(guildId).members.fetch(userIDs[array[j][0]]);
+                                await member.roles.remove([roles["Yes"], roles["If need be"], roles["No"]]);
+                                await member.roles.add(roles[array[j][i]]);
+                                console.log(`> Assigned ${array[j][0]} role ${array[j][i]} on ${new Date().toDateString()}`);
+                            }
                         }
                     }
-                }
+                });
             });
         });
     });
