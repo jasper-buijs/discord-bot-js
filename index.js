@@ -15,6 +15,7 @@ client.messageReports = new Array();
 client.userReports = new Array();
 client.temporaryVoiceChannels = new Array();
 client.gifSpamViolationTracker = new Array();
+const { createChannel } = require("./commands/create_private_conversation");
 client.formula1LiveData = {
     active: false
 }
@@ -115,6 +116,12 @@ client.on("voiceStateUpdate", async function(oldMember, newMember) {
             voiceChannel.delete();
         }
     });
+    if (newMember.channel) {
+        if (newMember.channel.name == "the abyss of awkwardness") {
+            let voiceChannelId = await createChannel(client, newMember.member, null);
+            newMember.member.voice.setChannel(voiceChannelId);
+        }
+    }
 });
 // BUTTON CLICKED (MUSIC CONTROLS (PLAY, PAUSE, SKIP))
 client.on("interactionCreate", async interaction => {
@@ -159,7 +166,7 @@ client.player.events.on("playerFinish", async function(queue, track) {
         return console.log("> UNKNOWN ERROR with MUSIC: " + err);
     });
     setTimeout(async function(message){
-        await message.delete();
+        await message.delete().catch();
     }, 15000, client.player.musicControlsMessage);
     client.user.setPresence({ activities: [], status: "online" });
 });
