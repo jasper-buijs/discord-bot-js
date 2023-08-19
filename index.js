@@ -15,6 +15,30 @@ client.messageReports = new Array();
 client.userReports = new Array();
 client.temporaryVoiceChannels = new Array();
 client.gifSpamViolationTracker = new Array();
+const statusMessages = [
+    "Pogging rn",
+    "有趣的鱼 鱼旋转",
+    "Goofy ahh, quirky",
+    "IQ op attack",
+    "Nunu, bottom text",
+    "Oh-la-la-la-la",
+    "Sole whack bloke the dominant",
+    "🐐 Lance Stroll",
+    "OSHI NO KO = PEAK FICTION + ABSOLUTE MASTERPIECE + ONE OF THE BEST ANIMES EVER MADE + GOAT + PHENOMENAL + WORK OF ART  💯🤍",
+    "Aight, FF!",
+    "Brameeert; om hoelaat wil je gaan slapen?",
+    "Ik haaaaat Maarten",
+    "Quelle bagarre!",
+    "Can't end on a win!",
+    "https://pbs.twimg.com/media/F3w1DvqXUAAZXFB?format=png&name=large",
+    "*Vine Boom Sound Effect*",
+    "Willi! du du dudu du",
+    "Matrix. (Tussen haakjes) wiskunde. In de lineaire algebra, een deelgebied van de wiskunde, is een matrix, meervoud: matrices, een rechthoekig getallenschema...",
+    "You already know who it is. It's ya boy ëRe ëRe āhha ëRe āhha ë-Ra ëRa ëRa ëRa ëRa- hÔaH hÔaH hÔaH fhreeēēēssshH. Sekou with da juice. And i got major juice",
+    "Tanja had gelijk. Ieuw."
+
+];
+client.sessionStatusMessage = statusMessages[Math.floor(Math.random()*statusMessages.length)];
 const { createChannel } = require("./commands/create_private_conversation");
 client.formula1LiveData = {
     active: false
@@ -67,6 +91,10 @@ client.on("interactionCreate", async interaction => {
         }
     }
 });
+// SET INTIAL PRECENCE
+client.on("ready", async () => {
+    client.user.setPresence({ activities: [{name: "custom", state: client.sessionStatusMessage, type: ActivityType.Custom}], status: "online" })
+})
 // MESSAGE CREATED IN SERVER (GIF FILTER)
 client.on("messageCreate", async message => {
     if (message.content.includes(".gif") || message.content.includes("tenor.com") || message.content.includes("giphy.com") || message.content.includes("imgur.com")) {
@@ -156,7 +184,7 @@ client.player.events.on("playerStart", async function(queue, track) {
         new ButtonBuilder().setLabel("Open in Browser").setURL(track.url).setStyle(ButtonStyle.Link)
     );
     console.log(`> MUSIC playing "${track.title}" (${track.url}) by ${queue.metadata.requestMember.displayName}`);
-    client.user.setPresence({ activities: [{ name: track.title, type: ActivityType.Playing }], status: "online" });
+    client.user.setPresence({ activities: [{name: "custom", state: client.sessionStatusMessage, type: ActivityType.Custom}], status: "online" });
     client.player.musicControlsMessage = await queue.metadata.textChannel.send({ content: `Started playing "${track.title}", as requested by <@${track.requestedBy.id}>.`, components: [controlButtons], flags: [MessageFlags.SuppressNotifications] });
 });
 // WHEN SONG STOPS PLAYING (END, STOP OR SKIP)
@@ -177,8 +205,10 @@ client.player.events.on("error", (queue, error) => {
 client.player.events.on("playerError", (queue, error) => {
     console.log(`> ERROR PLAYING MUSIC, connection error:\n${error}`);
 });
-// EVERY DAY AT MIDNIGHT (CLEAR GIF VIOLATIONS, COMMAND LINE AND VOICE CHANNEL TEXT CHANNELS)
+// EVERY DAY AT MIDNIGHT (CLEAR GIF VIOLATIONS, COMMAND LINE AND VOICE CHANNEL TEXT CHANNELS + UPDATE STATUS)
 schedule.scheduleJob("0 0 * * *", async () => {
+    client.sessionStatusMessage = statusMessages[Math.floor(Math.random()*statusMessages.length)];
+    client.user.setPresence({ activities: [{name: "custom", state: client.sessionStatusMessage, type: ActivityType.Custom}], status: "online" });
     client.gifSpamViolationTracker = [];
     await client.guilds.cache.get(guildId).channels.fetch();
     let voiceChannels = client.guilds.cache.get(guildId).channels.cache.filter(channel => channel.type == ChannelType.GuildVoice);
