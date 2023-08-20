@@ -33,8 +33,8 @@ const statusMessages = [
     "https://pbs.twimg.com/media/F3w1DvqXUAAZXFB?format=png&name=large",
     "*Vine Boom Sound Effect*",
     "Willi! du du dudu du",
-    "Matrix. (Tussen haakjes) wiskunde. In de lineaire algebra, een deelgebied van de wiskunde, is een matrix, meervoud: matrices, een rechthoekig getallenschema...",
-    "You already know who it is. It's ya boy ëRe ëRe āhha ëRe āhha ë-Ra ëRa ëRa ëRa ëRa- hÔaH hÔaH hÔaH fhreeēēēssshH. Sekou with da juice. And i got major juice",
+    "Matrix. (wiskunde). In de lineaire algebra, een deelgebied van de wiskunde, is een matrix, meervoud: matrices,...",
+    "You already know who it is. It's ya boy ëRe ëRe āhha ëRe āhha ë-Ra ëRa ëRa ëRa ëRa- hÔaH hÔaH hÔaH fhreeēēēssshH.",
     "Tanja had gelijk. Ieuw."
 
 ];
