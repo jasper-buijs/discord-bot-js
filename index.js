@@ -93,7 +93,7 @@ client.on("interactionCreate", async interaction => {
 });
 // SET INTIAL PRECENCE
 client.on("ready", async () => {
-    client.user.setPresence({ activities: [{name: "custom", state: client.sessionStatusMessage, type: ActivityType.Custom}], status: "online" })
+    client.user.setPresence({ activities: [{name: "custom", state: client.sessionStatusMessage, type: ActivityType.Custom}], status: "online" });
 })
 // MESSAGE CREATED IN SERVER (GIF FILTER)
 client.on("messageCreate", async message => {
@@ -196,7 +196,7 @@ client.player.events.on("playerFinish", async function(queue, track) {
     setTimeout(async function(message){
         await message.delete().catch();
     }, 15000, client.player.musicControlsMessage);
-    client.user.setPresence({ activities: [], status: "online" });
+    client.user.setPresence({ activities: [{name: "custom", state: client.sessionStatusMessage, type: ActivityType.Custom}], status: "online" })
 });
 // MUSIC ERRORS
 client.player.events.on("error", (queue, error) => {
@@ -208,7 +208,7 @@ client.player.events.on("playerError", (queue, error) => {
 // EVERY DAY AT MIDNIGHT (CLEAR GIF VIOLATIONS, COMMAND LINE AND VOICE CHANNEL TEXT CHANNELS + UPDATE STATUS)
 schedule.scheduleJob("0 0 * * *", async () => {
     client.sessionStatusMessage = statusMessages[Math.floor(Math.random()*statusMessages.length)];
-    client.user.setPresence({ activities: [{name: "custom", state: client.sessionStatusMessage, type: ActivityType.Custom}], status: "online" });
+    client.user.setPresence({ activities: [{ name: "custom", state: client.sessionStatusMessage, type: ActivityType.Custom }], status: "online" });
     client.gifSpamViolationTracker = [];
     await client.guilds.cache.get(guildId).channels.fetch();
     let voiceChannels = client.guilds.cache.get(guildId).channels.cache.filter(channel => channel.type == ChannelType.GuildVoice);
