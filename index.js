@@ -33,9 +33,13 @@ const statusMessages = [
     "https://pbs.twimg.com/media/F3w1DvqXUAAZXFB?format=png&name=large",
     "*Vine Boom Sound Effect*",
     "Willi! du du dudu du",
-    "Matrix. (wiskunde). In de lineaire algebra, een deelgebied van de wiskunde, is een matrix, meervoud: matrices,...",
+    "Matrix (wiskunde). In de lineaire algebra, een deelgebied van de wiskunde, is een matrix, meervoud: matrices,...",
     "You already know who it is. It's ya boy ëRe ëRe āhha ëRe āhha ë-Ra ëRa ëRa ëRa ëRa- hÔaH hÔaH hÔaH fhreeēēēssshH.",
-    "Tanja had gelijk. Ieuw."
+    "Tanja had gelijk. Ieuw.",
+    "Oh the misery..",
+    "Aandacht, aandacht! Ophaling van oude metalen, oud ijzer, oude wasmashines, ...",
+    "🤡",
+    "all 📠 no 🖨️"
 
 ];
 client.sessionStatusMessage = statusMessages[Math.floor(Math.random()*statusMessages.length)];
@@ -184,7 +188,7 @@ client.player.events.on("playerStart", async function(queue, track) {
         new ButtonBuilder().setLabel("Open in Browser").setURL(track.url).setStyle(ButtonStyle.Link)
     );
     console.log(`> MUSIC playing "${track.title}" (${track.url}) by ${queue.metadata.requestMember.displayName}`);
-    client.user.setPresence({ activities: [{name: "custom", state: client.sessionStatusMessage, type: ActivityType.Custom}], status: "online" });
+    client.user.setPresence({ activities: [{ name: track.title, type: ActivityType.Playing }], status: "online" });
     client.player.musicControlsMessage = await queue.metadata.textChannel.send({ content: `Started playing "${track.title}", as requested by <@${track.requestedBy.id}>.`, components: [controlButtons], flags: [MessageFlags.SuppressNotifications] });
 });
 // WHEN SONG STOPS PLAYING (END, STOP OR SKIP)

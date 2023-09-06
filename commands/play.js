@@ -33,6 +33,8 @@ module.exports = {
         else if (result.durationMS > 1800000) return await interaction.editReply({ content: "Unfortunately, I'm not allowed to play songs longer than 30 minutes.", ephemeral: true });
         const { track } = await client.player.play(interaction.member.voice.channel, result, {
             nodeOptions: {
+                /*bufferingTimeout: 10000,
+                connectionTimeout: 10000,*/
                 leaveOnEmpty: true,
                 leaveOnEmptyCooldown: 0,
                 leaveOnEnd: true,
