@@ -1,1 +1,5 @@
-console.log("Ben");
+const {Client, GatewayIntentBits} = require("discord.js");
+const client = new Client({intents: [GatewayIntentBits.Guilds]});
+
+
+client.login(Bun.env.TOKEN);

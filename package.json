@@ -3,12 +3,15 @@
   "module": "index.js",
   "type": "module",
   "scripts": {
-    "main": "bun run index.js"
+    "fun": "bun run index.js"
   },
   "devDependencies": {
     "bun-types": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "discord.js": "latest"
   }
 }
