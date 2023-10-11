@@ -1,17 +1,20 @@
 {
   "name": "discord-bot-js",
-  "module": "index.js",
-  "type": "module",
-  "scripts": {
-    "fun": "bun run index.js"
-  },
+  "version": "4.0.0-alpha.1",
+  "author": "Jasper Buijs",
+  "contributors": [
+    {
+      "name": "Wout Wenseleers"
+    }
+  ],
   "devDependencies": {
     "bun-types": "latest"
   },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
+  "scripts": {
+    "fun": "bun run index.js",
+    "deploy": "bun run deploy.js"
   },
   "dependencies": {
-    "discord.js": "latest"
+    "discord.js": "^14.13.0"
   }
 }
