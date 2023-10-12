@@ -2,19 +2,19 @@
   "name": "discord-bot-js",
   "version": "4.0.0-alpha.1",
   "author": "Jasper Buijs",
+  "dependencies": {
+    "discord.js": "^14.13.0"
+  },
   "contributors": [
     {
       "name": "Wout Wenseleers"
     }
   ],
-  "devDependencies": {
-    "bun-types": "latest"
-  },
   "scripts": {
     "fun": "bun run index.js",
     "deploy": "bun run deploy.js"
   },
-  "dependencies": {
-    "discord.js": "^14.13.0"
+  "devDependencies": {
+    "bun-types": "^1.0.6"
   }
 }
