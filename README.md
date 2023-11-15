@@ -19,10 +19,10 @@
 </p>
 <hr>
 
-> **Note**\
+> [!Note]
 > We are still in the process of rewriting this bot. As of now, there's not much to see here. We have a (private) roadmap of what we wish to do, but we are not setting any deadlines. We'll update this page as we progress and add features, specifically the <a href=#features>Features</a> paragraph. Check back soon for more!
 
-> **Important**\
+> [!Important]
 > Please carefully read our licensing information below before using any code in this repository, as this project is not licensed and is provided without any permissions or grants of use.
 
 ## Features
@@ -31,7 +31,7 @@ It's still early days in our rewrite of this bot. You'll find more information o
 ## Resources
 This project is written in JavaScript using Bun (a high-performance alternative for Node.js) and discord.js. You can find more info about these and any other third-party software we use by using the links down below.
 
-- <img src="https://user-images.githubusercontent.com/709451/182802334-d9c42afe-f35d-4a7b-86ea-9985f73f20c3.png" style="width:1em" /> [Bun](https://bun.sh) ([GitHub repo](https://github.com/oven-sh/bun); [licensed under MIT](https://bun.sh/docs/project/licensing))
+- <img src="https://user-images.githubusercontent.com/709451/182802334-d9c42afe-f35d-4a7b-86ea-9985f73f20c3.png" style="width:1em" /> [Bun](https://bun.sh) ([GitHub repo](https://github.com/oven-sh/bun); licensed under [MIT](https://bun.sh/docs/project/licensing))
 - <img src="https://avatars.githubusercontent.com/u/26492485" style="height:1em" /> [discord.js](https://discord.js.org) ([GitHub repo](https://github.com/discordjs/discord.js); licensed under [Apache License 2.0](https://github.com/discordjs/discord.js/blob/main/LICENSE))
 
 ## Licensing
