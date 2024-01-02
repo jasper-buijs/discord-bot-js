@@ -41,5 +41,5 @@ This project is built using third-party software. For detailed information about
 
 ---
 <div align="center">
-© Jasper Buijs, Heilige Maagden, 2023
+© Jasper Buijs, Heilige Maagden, 2024
 </div>
