@@ -1,5 +1,23 @@
 import { REST, Routes } from "discord.js";
 import fs from "node:fs";
+import { Database } from "bun:sqlite";
+import type { dbFormatProps } from "./types";
+
+
+const dbFormat: dbFormatProps = require("./dbformat.json");
+const db = new Database("db.sqlite", { create: true });
+
+
+for (var table in dbFormat) {
+  let columns: Array<string> = new Array();
+  Object.keys(dbFormat[table]).forEach(formatColumnName => {
+    if (formatColumnName != "clear") {
+      columns.push([formatColumnName, dbFormat[table][formatColumnName]].join(" "));
+    }
+  });
+  let createTables = db.query(`CREATE TABLE IF NOT EXISTS ${table} ( ${columns.join(", ")} );`);
+  createTables.run();
+}
 
 const commands = new Array();
 const commandsFolder = fs.readdirSync("./commands");

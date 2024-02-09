@@ -1,0 +1,8 @@
+{
+  "testTable": {
+    "id": "INTEGER PRIMARY KEY", 
+    "testString": "TEXT",
+    "testInt": "INTEGER",
+    "clear": true
+  }
+}
