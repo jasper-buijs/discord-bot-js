@@ -1,10 +1,11 @@
 import { Client, Collection, GatewayIntentBits, InteractionType } from "discord.js";
 import fs from "node:fs";
+import type { ClientProps } from "./types";
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client: ClientProps = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.commands = new Collection();
-const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
+const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".ts"));
 for (const commandFile of commandFiles) {
   const command = require("./commands/" + commandFile);
   client.commands.set(command.structure.name, command);
@@ -12,7 +13,9 @@ for (const commandFile of commandFiles) {
 
 client.on("interactionCreate", async interaction => {
   if (interaction.type == InteractionType.ApplicationCommand) {
+    if (!client.commands) return;
     const command = client.commands.get(interaction.commandName);
+    console.log(client.commands);
     if (!command) return;
     try {
       await command.execute(client, interaction);
@@ -24,5 +27,9 @@ client.on("interactionCreate", async interaction => {
     }
   }
 });
+
+client.on("ready", async () =>{
+  client.user?.setStatus("dnd");
+})
 
 client.login(Bun.env.TOKEN);

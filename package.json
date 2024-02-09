@@ -3,7 +3,7 @@
   "version": "4.0.0-alpha.1",
   "author": "Jasper Buijs",
   "dependencies": {
-    "discord.js": "^14.13.0"
+    "discord.js": "^14.14"
   },
   "contributors": [
     {
@@ -11,10 +11,10 @@
     }
   ],
   "scripts": {
-    "fun": "bun run index.js",
-    "deploy": "bun run deploy.js"
+    "fun": "bun run index.ts",
+    "deploy": "bun run deploy.ts"
   },
   "devDependencies": {
-    "bun-types": "^1.0.6"
+    "bun-types": "latest"
   }
 }
