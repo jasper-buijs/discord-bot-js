@@ -15,7 +15,7 @@
     "deploy": "bun run deploy.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "bun-types": "latest"
+    "@types/bun": "^1",
+    "bun-types": "^1"
   }
 }
