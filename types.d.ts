@@ -1,10 +1,10 @@
-import { Client, CommandInteraction, Collection } from "discord.js";
+import { Client, Collection } from "discord.js";
 
 interface ClientProps extends Client {
   commands?: Collection<string, any>;
 }
 
-interface dbFormatProps {
+interface dbFormatProps extends object {
   [keyName: string]: {
     [keyName: string]: string | boolean;
   }

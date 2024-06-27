@@ -32,4 +32,4 @@ client.on("ready", async () =>{
   client.user?.setStatus("dnd");
 })
 
-client.login(Bun.env.TOKEN);
+client.login(Bun.env.TOKEN).then(_ => console.log("> Online!"));

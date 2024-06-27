@@ -7,7 +7,7 @@ export const structure = new SlashCommandBuilder()
   .setDescription("Jow geef ons een string!")
   );
 
-export async function execute(client: Client, interaction: ChatInputCommandInteraction) {
+export async function execute(_client: Client, interaction: ChatInputCommandInteraction) {
   await interaction.deferReply({ ephemeral: true });
   await interaction.editReply({ content: interaction.options.getString("message") });
 }

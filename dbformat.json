@@ -1,8 +1,20 @@
 {
-  "testTable": {
-    "id": "INTEGER PRIMARY KEY", 
-    "testString": "TEXT",
-    "testInt": "INTEGER",
-    "clear": true
+  "poggers": {
+    "id": "INTEGER PRIMARY KEY",
+    "jijMoetTochWelNietOfMssTochWelIdkLOL": "INTEGER",
+    "Bruh": "TEXT",
+    "clear": false
+  },
+
+  "lala": {
+    "id": "INTEGER PRIMARY KEY",
+    "ROFLXD": "INTEGER",
+    "clear": false
+  },
+
+  "pogchamp": {
+    "id": "INTEGER PRIMARY KEY",
+    "lol": "INTEGER",
+    "clear": false
   }
 }

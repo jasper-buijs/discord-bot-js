@@ -1,9 +1,9 @@
 {
   "name": "discord-bot-js",
-  "version": "4.0.0-alpha.1",
+  "version": "4.0.0-alpha.2",
   "author": "Jasper Buijs",
   "dependencies": {
-    "discord.js": "^14.14"
+    "discord.js": "^14.15.3"
   },
   "contributors": [
     {
@@ -15,7 +15,7 @@
     "deploy": "bun run deploy.ts"
   },
   "devDependencies": {
-    "@types/bun": "^1",
-    "bun-types": "^1"
+    "@types/bun": "^1.1.6",
+    "bun-types": "^1.1.17"
   }
 }
