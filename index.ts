@@ -1,9 +1,10 @@
-import { Client, Collection, GatewayIntentBits, InteractionType } from "discord.js";
+import { Client, Collection, GatewayIntentBits } from "discord.js";
 import fs from "node:fs";
 import type { ClientProps } from "./types";
 
 const client: ClientProps = new Client({ intents: [GatewayIntentBits.Guilds] });
 
+// READ COMMAND FILES
 client.commands = new Collection();
 const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".ts"));
 for (const commandFile of commandFiles) {
@@ -11,25 +12,11 @@ for (const commandFile of commandFiles) {
   client.commands.set(command.structure.name, command);
 }
 
-client.on("interactionCreate", async interaction => {
-  if (interaction.type == InteractionType.ApplicationCommand) {
-    if (!client.commands) return;
-    const command = client.commands.get(interaction.commandName);
-    console.log(client.commands);
-    if (!command) return;
-    try {
-      await command.execute(client, interaction);
-    } catch (error) {
-      console.error(error);
-      await interaction.reply({ content: "There was an error :(" }).catch();
-      await interaction.editReply({ content: "There was an error :(" }).catch();
-      await interaction.followUp({ content: "There was an error :(" }).catch();
-    }
-  }
-});
+// READ CLIENT EVENT FILES
+const clientEventFiles = fs.readdirSync("./events/client").filter(file => file.endsWith(".ts"));
+for (const file of clientEventFiles) {
+  const event: { name: string, once: boolean, execute: (client: ClientProps, ...args: any[]) => Promise<void> } = require("./events/client/" + file);
+  if (event.once) client.once(event.name, (...args) => event.execute(client, ...args)); else client.on(event.name, (...args) => event.execute(client, ...args));
+}
 
-client.on("ready", async () =>{
-  client.user?.setStatus("dnd");
-})
-
-client.login(Bun.env.TOKEN).then(_ => console.log("> Online!"));
+client.login(Bun.env.TOKEN).then(_ => console.log("> Connecting to Discord and logging in..."));
