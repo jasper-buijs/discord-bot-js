@@ -1,7 +1,10 @@
-import { Client, Collection } from "discord.js";
+import { Collection, Client } from "discord.js";
+import type { Database } from "bun:sqlite";
 
 interface ClientProps extends Client {
-  commands?: Collection<string, any>;
+  guildId: string;
+  db: Database;
+  commands: Collection<string, any>;
 }
 
 interface dbFormatProps extends object {

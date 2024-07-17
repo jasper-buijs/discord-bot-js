@@ -1,11 +1,11 @@
-import { Client, Collection, GatewayIntentBits } from "discord.js";
+import { GatewayIntentBits } from "discord.js";
 import fs from "node:fs";
 import type { ClientProps } from "./types";
+import Wumpus from "./Wumpus.ts";
 
-const client: ClientProps = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client: ClientProps = new Wumpus({ intents: [GatewayIntentBits.Guilds] });
 
 // READ COMMAND FILES
-client.commands = new Collection();
 const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".ts"));
 for (const commandFile of commandFiles) {
   const command = require("./commands/" + commandFile);
