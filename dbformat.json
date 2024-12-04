@@ -1,20 +1,9 @@
 {
-  "poggers": {
+  "schedule": {
     "id": "INTEGER PRIMARY KEY",
-    "jijMoetTochWelNietOfMssTochWelIdkLOL": "INTEGER",
-    "Bruh": "TEXT",
-    "clear": false
-  },
-
-  "lala": {
-    "id": "INTEGER PRIMARY KEY",
-    "ROFLXD": "INTEGER",
-    "clear": false
-  },
-
-  "pogchamp": {
-    "id": "INTEGER PRIMARY KEY",
-    "lol": "INTEGER",
-    "clear": false
+    "name": "TEXT",
+    "function": "TEXT",
+    "arguments": "BLOB",
+    "clear": true
   }
 }

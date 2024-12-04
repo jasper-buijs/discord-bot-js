@@ -1,10 +1,10 @@
 import { REST, Routes } from "discord.js";
 import fs from "node:fs";
 import { Database } from "bun:sqlite";
-import type { dbFormatProps } from "./types";
+import type { DBFormatProps } from "./types";
 
 
-const dbFormat: dbFormatProps = require("./dbformat.json");
+const dbFormat: DBFormatProps = require("./dbformat.json");
 const db = new Database("db.sqlite", { create: true });
 
 // CREATE TABLES
