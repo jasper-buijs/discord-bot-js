@@ -7,7 +7,7 @@ import type { JobInformation } from "../types";
  *
  * @param {string} name - The descriptive name of the function
  * @param timestamps - Array of cron strings
- * @param function_ - The callback function to run
+ * @param function_ - The callback function to run; this must be an arrow function
  * @param [args] - The arguments to pass along
  *
  * @return {Promise<JobInformation[]>} - An array of information objects for each timestamp.
