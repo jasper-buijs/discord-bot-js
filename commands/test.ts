@@ -1,13 +1,10 @@
-import { Client, SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
+import { Client, SlashCommandBuilder, ChatInputCommandInteraction, MessageFlags } from "discord.js";
 
 export const structure = new SlashCommandBuilder()
-  .setName("test")
-  .setDescription("Dit is een test :D")
-  .addStringOption(option => option.setName("message")
-  .setDescription("Jow geef ons een string!")
-  );
+  .setName("ping")
+  .setDescription("Simple ping-pong command.");
 
 export async function execute(_client: Client, interaction: ChatInputCommandInteraction) {
-  await interaction.deferReply({ ephemeral: true });
-  await interaction.editReply({ content: interaction.options.getString("message") });
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+  await interaction.editReply({ content: "Pong!" });
 }

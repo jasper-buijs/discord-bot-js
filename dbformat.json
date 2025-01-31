@@ -5,5 +5,15 @@
     "function": "TEXT",
     "arguments": "BLOB",
     "clear": true
+  },
+  "gifs": {
+    "id": "INTEGER PRIMARY KEY",
+    "messageId": "INTEGER",
+    "content": "TEXT",
+    "channel": "TEXT",
+    "author": "TEXT",
+    "time": "INTEGER",
+    "deleted": "INTEGER",
+    "clear": false
   }
 }

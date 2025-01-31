@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import type { ClientProps } from "../../types";
 import { Events } from "discord.js";
 import { Database } from "bun:sqlite";
