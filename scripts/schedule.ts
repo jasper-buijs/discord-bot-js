@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import { Cron } from "croner";
 import { Database } from "bun:sqlite";
 import type { JobInformation } from "../types";
@@ -6,13 +8,13 @@ import type { JobInformation } from "../types";
  * Register a planned or recurring function.
  *
  * @param {string} name - The descriptive name of the function
- * @param timestamps - Array of cron strings
- * @param function_ - The callback function to run; this must be an arrow function
- * @param [args] - The arguments to pass along
+ * @param {string[]} timestamps - Array of cron strings
+ * @param {Function} function_ - The callback function to run; this must be an arrow function
+ * @param {any[]} [args] - The arguments to pass along
  *
  * @return {Promise<JobInformation[]>} - An array of information objects for each timestamp.
  *
- * @example register("function name", ["0 13 * * *", "0 14 * * *"], function, arg1, arg2)
+ * @example register("function name", ["0 13 * * *", "0 14 * * *"], function, arg1, arg2);
  */
 export async function register(name: string, timestamps: string[], function_: Function, ...args: any[]): Promise<JobInformation[]> {
   const db = new Database(import.meta.dir + "/../db.sqlite");
