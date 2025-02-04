@@ -8,6 +8,9 @@ export const name = Events.MessageCreate;
 export const once = false;
 
 export async function execute(client: ClientProps, message: Message, ..._args: any[]): Promise<void> {
+  // Check for correct guild
+  if (message.guildId != client.guildId) return;
+
   /* GIF FILTER */
   // Check for allowed channel
   const allowedChannels = ["gifs-and-memes", "age-restricted"];

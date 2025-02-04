@@ -7,7 +7,13 @@ export const name = Events.InteractionCreate;
 export const once = false;
 
 export async function execute(client: ClientProps, ...args: any[]) {
+  // ARGUMENT HANDLING
   const interaction: Interaction = args[0];
+
+  // Check for correct guild
+  if (interaction.guildId != client.guildId) return;
+
+  /* RUN INTERACTION */
   if (interaction.type == InteractionType.ApplicationCommand) {
     if (!client.commands) throw new Error("A slash command was used, but no commands are registered in client.commands");
     const command = client.commands.get(interaction.commandName);
