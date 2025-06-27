@@ -15,5 +15,11 @@
     "time": "INTEGER",
     "deleted": "INTEGER",
     "clear": false
+  },
+  "temporaryChannels": {
+    "id": "INTEGER PRIMARY KEY",
+    "channelId": "TEXT",
+    "userId": "TEXT",
+    "clear": false
   }
 }

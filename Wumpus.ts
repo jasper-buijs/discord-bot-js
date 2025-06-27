@@ -4,6 +4,6 @@ import { Database } from "bun:sqlite";
 
 export default class Wumpus extends Client implements ClientProps {
   public guildId = Bun.env.GUILDID;
-  public db = new Database("db.sqlite");
+  public db = new Database("db.sqlite", {safeIntegers: true});
   public commands = new Collection<string, any>();
 }

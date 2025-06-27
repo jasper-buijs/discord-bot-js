@@ -3,7 +3,7 @@ import fs from "node:fs";
 import type { ClientProps } from "./types";
 import Wumpus from "./Wumpus.ts";
 
-const client: ClientProps = new Wumpus({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+const client: ClientProps = new Wumpus({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates] });
 
 // READ COMMAND FILES
 const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".ts"));
